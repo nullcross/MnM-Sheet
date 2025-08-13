@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutants & Masterminds - Character Sheet</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wdth,wght@0,62.5..100,100..900;1,62.5..100,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="main.css" />
+
+    <script type="module" src="scripts/vue-manager.js"></script>
+</head>
+
+<body id="app">
+
+    <div id="meta-ui">
+        <button id="toggle-theme" type="button" value="0" @click="setTheme"
+                title="Theme: System Default - Click to switch"
+                aria-label="Theme: System Default - Click to switch">
+            <img src="" alt="">
+        </button>
+    </div>
+
+    <div id="sheet-grid">
+
+        <div id="sheet-header" class="row-section">
+            <h1>
+                <input type="text" name="name" id="hero-name" placeholder="(Hero Name)" :value="stats.name" @change="applyChanges">
+            </h1>
+
+            <div id="identity-and-status">
+                <div class="labeled-text">
+                    <input type="text" name="altIdentity" id="hero-identity" :value="stats.altIdentity" @change="applyChanges">
+                    <label for="hero-identity">Alternate Identity</label>
+                </div>
+                <div class="labeled-button">
+                    <button id="ident-secrecy" class="invertable-svg" :value="stats.identSecrecy" @click="stats.identSecrecy = !stats.identSecrecy"></button>
+                    <label for="ident-secrecy">{{stats.identSecrecy ? "Secret" : "Public"}}</label>
+                </div>
+            </div>
+
+            <div id="power-and-points">
+                <div class="labeled-text">
+                    <input type="text" name="powerLevel" id="power-level" :value="stats.powerLevel" @change="applyParsedChanges($event, NumberTypes.INT)">
+                    <label for="power-level">Power Level</label>
+                </div>
+                <div class="labeled-text">
+                    <output for="power-level" id="points-used"><span>{{"0 / " + stats.powerLevel * 15}}</span></output>
+                    <label for="points-used">Points Used</label>
+                </div>
+            </div>
+
+            <div id="affiliation-hq-debut">
+                <div class="labeled-text">
+                    <input type="text" name="affiliation" id="hero-affiliation" :value="stats.affiliation" @change="applyChanges">
+                    <label for="hero-affiliation">Group Affiliation</label>
+                </div>
+                <div class="labeled-text">
+                    <input type="text" name="base" id="hero-base" :value="stats.base" @change="applyChanges">
+                    <label for="hero-base">Base of Operations</label>
+                </div>
+                <div class="labeled-text">
+                    <input type="text" name="debut" id="first-appearance" :value="stats.debut" @change="applyChanges">
+                    <label for="first-appearance">First Appearance</label>
+                </div>
+            </div>
+
+
+            <div id="physical-attributes">
+                <div class="labeled-text">
+                    <input type="text" name="size" id="hero-size" :value="stats.size" @change="applyChanges">
+                    <label for="hero-size">Size</label>
+                </div>
+                <div class="labeled-text">
+                    <input type="text" name="height" id="hero-height" :value="stats.height" @change="applyChanges">
+                    <label for="hero-height">Height</label>
+                </div>
+                <div class="labeled-text">
+                    <input type="text" name="age" id="hero-age" :value="stats.age" @change="applyChanges">
+                    <label for="hero-age">Age</label>
+                </div>
+                <div class="labeled-text">
+                    <input type="text" name="weight" id="hero-weight" :value="stats.weight" @change="applyChanges">
+                    <label for="hero-weight">Weight</label>
+                </div>
+                <div class="labeled-text">
+                    <input type="text" name="eyes" id="hero-eyes" :value="stats.eyes" @change="applyChanges">
+                    <label for="hero-eyes">Eyes</label>
+                </div>
+                <div class="labeled-text">
+                    <input type="text" name="hair" id="hero-hair" :value="stats.hair" @change="applyChanges">
+                    <label for="hero-hair">Hair</label>
+                </div>
+            </div>
+        </div>
+
+        <h1 id="ability-scores-head">Abilities & Saves</h1>
+
+        <div id="ability-scores" class="row-section">
+
+            <div id="scores-row-1">
+                <div id="big-six">
+                    <div class="score-container">
+                        <h2 class="score-title">Strength</h2>
+                        <output class="score-total" for="str-base str-extr">
+                            <span>{{getScoreTotal("str")}}</span>
+                            <output class="score-bonus"><span>{{"+" + getScoreBonus("str")}}</span></output>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="strBase" id="str-base" :value="stats.strBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="str-base">Base</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="strExtr" id="str-extr" :value="stats.strExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="str-extr">Enhanced</label>
+                        </div>
+                    </div>
+
+                    <div class="score-container">
+                        <h2 class="score-title">Dexterity</h2>
+                        <output class="score-total" for="dex-base dex-extr">
+                            <span>{{getScoreTotal("dex")}}</span>
+                            <output class="score-bonus"><span>{{"+" + getScoreBonus("dex")}}</span></output>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="dexBase" id="dex-base" :value="stats.dexBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="dex-base">Base</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="dexExtr" id="dex-extr" :value="stats.dexExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="dex-extr">Enhanced</label>
+                        </div>
+                    </div>
+                    <div class="score-container">
+                        <h2 class="score-title">Constitution</h2>
+                        <output class="score-total" for="con-base con-extr">
+                            <span>{{getScoreTotal("con")}}</span>
+                            <output class="score-bonus"><span>{{"+" + getScoreBonus("con")}}</span></output>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="conBase" id="con-base" :value="stats.conBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="con-base">Base</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="conExtr" id="con-extr" :value="stats.conExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="con-extr">Enhanced</label>
+                        </div>
+                    </div>
+                    <div class="score-container">
+                        <h2 class="score-title">Intelligence</h2>
+                        <output class="score-total" for="int-base int-extr">
+                            <span>{{getScoreTotal("int")}}</span>
+                            <output class="score-bonus"><span>{{"+" + getScoreBonus("int")}}</span></output>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="intBase" id="int-base" :value="stats.intBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="int-base">Base</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="intExtr" id="int-extr" :value="stats.intExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="int-extr">Enhanced</label>
+                        </div>
+                    </div>
+                    <div class="score-container">
+                        <h2 class="score-title">Wisdom</h2>
+                        <output class="score-total" for="wis-base wis-extr">
+                            <span>{{getScoreTotal("wis")}}</span>
+                            <output class="score-bonus"><span>{{"+" + getScoreBonus("wis")}}</span></output>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="wisBase" id="wis-base" :value="stats.wisBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="wis-base">Base</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="wisExtr" id="wis-extr" :value="stats.wisExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="wis-extr">Enhanced</label>
+                        </div>
+                    </div>
+                    <div class="score-container">
+                        <h2 class="score-title">Charisma</h2>
+                        <output class="score-total" for="cha-base cha-extr">
+                            <span>{{getScoreTotal("cha")}}</span>
+                            <output class="score-bonus"><span>{{"+" + getScoreBonus("cha")}}</span></output>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="chaBase" id="cha-base" :value="stats.chaBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="cha-base">Base</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="chaExtr" id="cha-extr" :value="stats.chaExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="cha-extr">Enhanced</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="save-scores">
+                    <div class="score-container">
+                        <h2 class="score-title">Toughness</h2>
+                        <output class="score-total" for="tou-base tou-extr">
+                            <span>{{getScoreTotal("tou") + getScoreBonus("con")}}</span>
+                            <div class="score-bonus"><span>CON</span></div>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="touBase" id="tou-base" :value="stats.touBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="tou-base">Base Mod.</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="touExtr" id="tou-extr" :value="stats.touExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="tou-extr">Misc. Mod.</label>
+                        </div>
+                    </div>
+
+                    <div class="score-container">
+                        <h2 class="score-title">Fortitude</h2>
+                        <output class="score-total" for="for-base for-extr">
+                            <span>{{getScoreTotal("for") + getScoreBonus("con")}}</span>
+                            <div class="score-bonus"><span>CON</span></div>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="forBase" id="for-base" :value="stats.forBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="for-base">Base Mod.</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="forExtr" id="for-extr" :value="stats.forExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="for-extr">Misc. Mod.</label>
+                        </div>
+                    </div>
+
+                    <div class="score-container">
+                        <h2 class="score-title">Reflex</h2>
+                        <output class="score-total" for="ref-base ref-extr">
+                            <span>{{getScoreTotal("ref") + getScoreBonus("dex")}}</span>
+                            <div class="score-bonus"><span>DEX</span></div>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="refBase" id="ref-base" :value="stats.refBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="ref-base">Base Mod.</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="refExtr" id="ref-extr" :value="stats.refExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="ref-extr">Misc. Mod.</label>
+                        </div>
+                    </div>
+
+                    <div class="score-container">
+                        <h2 class="score-title">Will</h2>
+                        <output class="score-total" for="wil-base wil-extr">
+                            <span>{{getScoreTotal("wil") + getScoreBonus("wis")}}</span>
+                            <div class="score-bonus"><span>WIS</span></div>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="wilBase" id="wil-base" :value="stats.wilBase" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="wil-base">Base Mod.</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="wilExtr" id="wil-extr" :value="stats.wilExtr" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="wil-extr">Misc. Mod.</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scores-row-2">
+
+                <div id="hero-points-container" class="labeled-text invertable-svg_pseudo full-brightness">
+                    <input id="hero-points" type="text" size="1" name="heroPoints" :value="stats.heroPoints" @change="applyParsedChanges($event, NumberTypes.INT)">
+                    <label for="hero-points">Hero Points</label>
+                </div>
+
+                <div id="conditions">
+                    <div class="labeled-text">
+                        <input id="bruises" type="text" name="bruises" size="10" :value="stats.bruises" @change="applyParsedChanges($event, NumberTypes.INT)">
+                        <label for="bruises">Bruises</label>
+                    </div>
+                    <div class="labeled-text">
+                        <input id="injuries" type="text" name="injuries" size="10" :value="stats.injuries" @change="applyParsedChanges($event, NumberTypes.INT)">
+                        <label for="injuries">Injuries</label>
+                    </div>
+                    <div class="labeled-check">
+                        <input type="checkbox" name="staggered" id="staggered" v-model="stats.staggered">
+                        <label for="staggered">Staggered</label>
+                    </div>
+                    <div class="labeled-check">
+                        <input type="checkbox" name="disabled" id="disabled" v-model="stats.disabled">
+                        <label for="disabled">Disabled</label>
+                    </div>
+                    <div class="labeled-check">
+                        <input type="checkbox" name="unconscious" id="unconscious" v-model="stats.unconscious">
+                        <label for="unconscious">Unconscious</label>
+                    </div>
+                    <div class="labeled-check">
+                        <input type="checkbox" name="dying" id="dying" v-model="stats.dying">
+                        <label for="dying">Dying</label>
+                    </div>
+                    <div class="labeled-check">
+                        <input type="checkbox" name="fatigued" id="fatigued" v-model="stats.fatigued">
+                        <label for="fatigued">Fatigued</label>
+                    </div>
+                    <div class="labeled-check">
+                        <input type="checkbox" name="exhausted" id="exhausted" v-model="stats.exhausted">
+                        <label for="exhausted">Exhausted</label>
+                    </div>
+                </div>
+
+                <div id="misc-combat">
+                    <div id="defense-score" class="score-container">
+                        <h2 class="score-title">Defense</h2>
+                        <output class="score-total" for="defense-bonus extra-dodge">
+                            <span>{{stats.defenseBonus + stats.extraDodge + stats.sizeBonus}}</span>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="defenseBonus" id="defense-bonus" :value="stats.defenseBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="defense-bonus">Base Bonus</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="extraDodge" id="extra-dodge" :value="stats.extraDodge" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="extra-dodge">Extr. Dodge</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="sizeBonus" id="size-bonus" :value="stats.sizeBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="size-bonus">Size Bonus</label>
+                        </div>
+                    </div>
+                    <div class="score-container">
+                        <h2 class="score-title">Initiative</h2>
+                        <output class="score-total" for="initiative-power initiative-feat">
+                            <span>{{stats.initiativePower + stats.initiativeFeat + getScoreBonus("dex")}}</span>
+                            <div class="score-bonus"><span>DEX</span></div>
+                        </output>
+                        <div class="labeled-text base-container">
+                            <input type="text" name="initiativePower" id="initiative-power" :value="stats.initiativePower" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="initiative-power">Power Mod.</label>
+                        </div>
+                        <div class="labeled-text extr-container">
+                            <input type="text" name="initiativeFeat" id="initiative-feat" :value="stats.initiativeFeat" @change="applyParsedChanges($event, NumberTypes.INT)">
+                            <label for="initiative-feat">Feat Mod.</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="atk-bonuses">
+                    <div class="labeled-text">
+                        <input id="attack-bonus" type="text" name="attackBonus" size="8" :value="stats.attackBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
+                        <label for="attack-bonus">Attack Bonus</label>
+                    </div>
+                    <div class="labeled-text">
+                        <input id="melee-bonus" type="text" name="meleeBonus" size="8" :value="stats.meleeBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
+                        <label for="melee-bonus">Melee Bonus</label>
+                    </div>
+                    <div class="labeled-text">
+                        <input id="ranged-bonus" type="text" name="rangedBonus" size="8" :value="stats.rangedBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
+                        <label for="ranged-bonus">Ranged Bonus</label>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <p><br><br><br><br>TEMP/TESTING</p>
+        <hr>
+        <p><br></p>
+        <div>
+            <p>
+                <span>({{stats}})</span> <br>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quod aliquam provident, libero commodi rem voluptates odit reiciendis culpa quae vero molestias
+                ullam odio quis exercitationem consectetur inventore. Iusto, deserunt blanditiis. Lorem, ipsum dolor sit amet consectetur adipisicing elit. Mollitia, numquam minima
+                ad sint error alias nesciunt id quasi repudiandae quibusdam adipisci beatae nam omnis atque officiis, quos, debitis illum necessitatibus.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
