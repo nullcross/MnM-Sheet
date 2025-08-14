@@ -26,6 +26,7 @@
 
     <div id="sheet-grid">
 
+        <!-- #region Header -->
         <div id="sheet-header" class="row-section">
             <h1>
                 <input type="text" name="name" id="hero-name" placeholder="(Hero Name)" :value="stats.name" @change="applyChanges">
@@ -96,7 +97,9 @@
                 </div>
             </div>
         </div>
+        <!-- #endregion -->
 
+        <!-- #region Abilities & Saves -->
         <h1 id="ability-scores-head">Abilities & Saves</h1>
 
         <div id="ability-scores" class="row-section">
@@ -278,6 +281,8 @@
                     </div>
                 </div>
 
+                <hr class="invertable-svg">
+
                 <div id="conditions">
                     <div class="labeled-text">
                         <input id="bruises" type="text" name="bruises" size="10" :value="stats.bruises" @change="applyParsedChanges($event, NumberTypes.INT)">
@@ -373,6 +378,7 @@
             </div>
 
         </div>
+        <!-- #endregion -->
 
 
         <p><br><br><br><br>TEMP/TESTING</p>

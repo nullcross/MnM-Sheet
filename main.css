@@ -562,6 +562,18 @@ input[type="text"],
     justify-content: space-between;
     gap: 2.5em;
     margin-top: 1.8em;
+
+    & hr
+    {
+        --scores-row2-hr-width: 3px;
+        width: var(--scores-row2-hr-width);
+        border: none;
+
+        background-image: url("./media/dashed-border-segment.svg");
+        background-size: calc(100% * (2/3)) 6px;
+        background-repeat: repeat space;
+        opacity: 0.33;
+    }
 }
 
 /* #region Row 1 */
@@ -930,6 +942,7 @@ input[type="text"],
 
 /* #endregion */
 
+/* #region Combat Scores */
 
 #atk-bonuses
 {
@@ -989,6 +1002,8 @@ input[type="text"],
         "titl titl titl"
         "base enha misc";
 }
+
+/* #endregion */
 
 /* #endregion */
 
