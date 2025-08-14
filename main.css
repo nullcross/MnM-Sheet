@@ -907,25 +907,6 @@ input[type="text"],
 
 /* #endregion */
 
-/* See row 1, save scores */
-#misc-combat
-{
-    gap: 1.25em;
-
-    & .score-container
-    {
-        margin: auto;
-    }
-}
-
-#defense-score
-{
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-areas:
-        "totl totl totl"
-        "titl titl titl"
-        "base enha misc";
-}
 
 #atk-bonuses
 {
@@ -954,6 +935,26 @@ input[type="text"],
             text-align: center;
         }
     }
+}
+
+/* See row 1, save scores */
+#misc-combat
+{
+    gap: 1.25em;
+
+    & .score-container
+    {
+        margin: auto;
+    }
+}
+
+#defense-score
+{
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas:
+        "totl totl totl"
+        "titl titl titl"
+        "base enha misc";
 }
 
 /* #endregion */
