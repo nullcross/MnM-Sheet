@@ -558,8 +558,9 @@ input[type="text"],
 {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     gap: 2.5em;
-    margin-top: 1.5em;
+    margin-top: 1.8em;
 }
 
 /* #region Row 1 */
@@ -910,10 +911,13 @@ input[type="text"],
 
 #atk-bonuses
 {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas: 
+        "gnral gnral"
+        "melee rnged";
     align-items: center;
-    gap: 1em;
+    gap: 0.2em 0.5em;
 
     font-size: 1.5em;
     font-family: var(--font-header);
@@ -924,6 +928,12 @@ input[type="text"],
     & .labeled-text
     {
         --label-in-margin-size: 2.1em;
+
+        &:first-child
+        {
+            grid-area: gnral;
+            --label-in-margin-size: 1.1em;
+        }
 
         & input
         {
