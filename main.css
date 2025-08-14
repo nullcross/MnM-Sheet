@@ -725,75 +725,117 @@ input[type="text"],
 
 /* #region Hero Points */
 
-#hero-points-container
+#hero-points-outer
 {
-    --points-font-factor: 1.75;
-    font-size: calc(1em * var(--points-font-factor));
-
-    --points-outer-size: calc(14ch / var(--points-font-factor));
-    width: var(--points-outer-size);
-    height: var(--points-outer-size);
-
-    position: relative;
-    display: flex;
-    justify-content: space-around;
-
-    /* Should equal 10px when above is 14ch / ... */
-    --points-centering-factor: calc(var(--points-outer-size) * (17500/193433));
-    margin-left: var(--points-centering-factor);
-    margin-right: var(--points-centering-factor);
-
-    &::before
-    {
-        content: "";
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: -1;
-
-        background-image: url("./media/sun-3-svgrepo-com.svg");
-        background-size: 100% 100%;
-        --smoother-stroke-color: var(--text-primary);
-        --smoother-stroke-radius: 0;
-        filter: drop-shadow(0 -0.01Q var(--smoother-stroke-radius) var(--smoother-stroke-color)) drop-shadow(0 -0.01Q var(--smoother-stroke-radius) var(--smoother-stroke-color)) drop-shadow(0 -0.01Q var(--smoother-stroke-radius) var(--smoother-stroke-color)) drop-shadow(0 -0.01Q var(--smoother-stroke-radius) var(--smoother-stroke-color)) drop-shadow(0 -0.01Q var(--smoother-stroke-radius) var(--smoother-stroke-color));
-    }
-
-    & > label
-    {
-        color: var(--text-primary);
-
-        width: max-content;
-        text-align: center;
-        /* Should equal 10px by countering font size difference w/ above */
-        left: calc(var(--points-centering-factor) * (-100000/134167));
-    }
-}
-
-#hero-points
-{
-    font-size: calc(2.4em / var(--points-font-factor));
-
-    --inner-input-width: calc(var(--points-outer-size) * 0.45);
-    width: var(--inner-input-width);
-    height: var(--inner-input-width);
-    box-sizing: content-box;
-    padding: calc(var(--points-outer-size) * 0.048);
-
-    background-color: var(--background-primary);
-    border: 1px solid var(--text-primary);
-    border-radius: 100%;
-    text-align: center;
-
-    position: absolute;
-    right: 50%;
-    transform: translateX(50%);
+    display: grid;
+    grid-template-rows: 1fr auto;
 
     font-family: var(--font-header);
     font-weight: 600;
     font-variation-settings: "wdth" 75;
     text-transform: uppercase;
+
+    & > h2
+    {
+        order: 1;
+        margin-top: 0.2em;
+        font-size: 1.8em;
+        text-align: center;
+    }
+}
+
+#hero-points-inner
+{
+    --hp-total-size: 18ch;
+    width: var(--hp-total-size);
+    height: var(--hp-total-size);
+
+    position: relative;
+
+    &::before
+    {
+        content: "";
+        display: block;
+        position: absolute;
+        inset: 0;
+
+        background-image: url("./media/sun-3-svgrepo-com.svg");
+        background-size: 100% 100%;
+    }
+
+    & button
+    {
+        width: 3ch;
+        height: 3ch;
+        padding: 0;
+
+        font-size: 1.5em;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+        color: color-mix(in oklab, var(--text-primary) 80%, transparent);
+
+        background-color: color-mix(in oklab, var(--background-primary) 66%, transparent);
+        border: 1px solid color-mix(in oklab, currentColor 80%, transparent);
+        border-radius: 100%;
+
+        position: absolute;
+        bottom: 0;
+
+        &:nth-of-type(odd)
+        {
+            left: 0;
+        }
+        &:nth-of-type(even)
+        {
+            right: 0;
+        }
+
+        &:focus, &:hover
+        {
+            &:not(:disabled)
+            {
+                color: var(--text-primary);
+                background-color: color-mix(in oklab, var(--background-primary) 85%, transparent);
+            }
+        }
+        &:active
+        {
+            /* Somewhat redundant, but keeps specificity in line with above */
+            &:not(:disabled)
+            {
+                color: var(--text-secondary);
+                background-color: var(--background-primary);
+            }
+            &:disabled
+            {
+                color: color-mix(in oklab, var(--text-secondary) 75%, black);
+            }
+        }
+
+        &:disabled
+        {
+            color: var(--text-secondary);
+        }
+    }
+}
+
+#hero-points
+{
+    display: flex;
+    align-items: center;
+
+    position: absolute;
+    /* should equal 2ch when size is 18ch */
+    inset: calc(var(--hp-total-size) / 9);
+
+    border: 1px solid color-mix(in oklab, var(--text-primary) 60%, transparent);
+    border-radius: 100%;
+
+    & > *
+    {
+        font-size: 2.5em;
+        margin: auto;
+    }
 }
 
 /* #endregion */
@@ -808,18 +850,19 @@ input[type="text"],
     grid-auto-flow: column;
     gap: 0 1.5em;
 
-    & .labeled-text,
-    & .labeled-check
-    {
-        font-family: var(--font-header);
-        font-weight: 600;
-        font-variation-settings: "wdth" 75;
-        text-transform: uppercase;
-    }
+    font-family: var(--font-header);
+    font-weight: 600;
+    font-variation-settings: "wdth" 75;
+    text-transform: uppercase;
+
+    --condition-label-size: 1.5;
+    --extra-cond-label-margin: 0.1;
+    margin: calc((1.1em + (1em * var(--extra-cond-label-margin))) * var(--condition-label-size)) 0;
 
     & .labeled-text
     {
-        font-size: 1.5em;
+        font-size: calc(1em * var(--condition-label-size));
+        margin: 0;
 
         & input
         {
@@ -833,9 +876,6 @@ input[type="text"],
 
         &:nth-child(odd)
         {
-            margin-bottom: 0;
-            margin-top: var(--label-in-margin-size);
-
             & input
             {
                 border-top-width: 1px;
@@ -843,8 +883,12 @@ input[type="text"],
             & label
             {
                 bottom: unset;
-                top: calc(var(--label-in-margin-size) * -1);
+                top: calc(var(--label-in-margin-size) * -1 - 1em * var(--extra-cond-label-margin));
             }
+        }
+        &:nth-child(even) label
+        {
+            bottom: calc(var(--label-in-margin-size) * -1 - 1em * var(--extra-cond-label-margin));
         }
     }
 
@@ -858,44 +902,20 @@ input[type="text"],
             margin-left: 0.25em;
             color: var(--text-secondary);
         }
-
-        &:nth-child(odd)
-        {
-            margin-top: 1.1em;
-        }
-        &:nth-child(even)
-        {
-            margin-bottom: 1.1em;
-        }
     }
 }
 
 /* #endregion */
 
-#atk-bonuses
-{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1em;
-
-    font-size: 1.5em;
-
-    & .labeled-text input
-    {
-        text-align: center;
-    }
-    & .labeled-text label
-    {
-        width: 100%;
-        text-align: center;
-    }
-}
-
 /* See row 1, save scores */
 #misc-combat
 {
     gap: 1.25em;
+
+    & .score-container
+    {
+        margin: auto;
+    }
 }
 
 #defense-score
@@ -905,6 +925,35 @@ input[type="text"],
         "totl totl totl"
         "titl titl titl"
         "base enha misc";
+}
+
+#atk-bonuses
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
+
+    font-size: 1.5em;
+    font-family: var(--font-header);
+    font-weight: 600;
+    font-variation-settings: "wdth" 75;
+    text-transform: uppercase;
+
+    & .labeled-text
+    {
+        --label-in-margin-size: 2.1em;
+
+        & input
+        {
+            text-align: center;
+        }
+        & label
+        {
+            width: 100%;
+            text-align: center;
+        }
+    }
 }
 
 /* #endregion */

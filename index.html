@@ -265,9 +265,17 @@
 
             <div id="scores-row-2">
 
-                <div id="hero-points-container" class="labeled-text invertable-svg_pseudo full-brightness">
-                    <input id="hero-points" type="text" size="1" name="heroPoints" :value="stats.heroPoints" @change="applyParsedChanges($event, NumberTypes.INT)">
-                    <label for="hero-points">Hero Points</label>
+                <div id="hero-points-outer">
+                    <h2>Hero Points</h2>
+                    <div id="hero-points-inner" class="invertable-svg_pseudo full-brightness">
+                        <output id="hero-points" name="heroPoints" for="hero-points-sub hero-points-add">
+                            <span>{{stats.heroPoints}}</span>
+                        </output>
+                        <button id="hero-points-sub" type="button" name="heroPointsSub" @click="stats.heroPoints--" :disabled="stats.heroPoints <= 0"
+                                aria-label="-1 Hero Point" aria-controls="hero-points">-</button>
+                        <button id="hero-points-add" type="button" name="heroPointsAdd" @click="stats.heroPoints++"
+                                aria-label="+1 Hero Point" aria-controls="hero-points">+</button>
+                    </div>
                 </div>
 
                 <div id="conditions">
@@ -280,28 +288,49 @@
                         <label for="injuries">Injuries</label>
                     </div>
                     <div class="labeled-check">
-                        <input type="checkbox" name="staggered" id="staggered" v-model="stats.staggered">
+                        <input type="checkbox" name="staggered" id="staggered" v-model="stats.staggered"
+                               @keyup.enter="stats.staggered = !stats.staggered" :aria-checked="stats.staggered">
                         <label for="staggered">Staggered</label>
                     </div>
                     <div class="labeled-check">
-                        <input type="checkbox" name="disabled" id="disabled" v-model="stats.disabled">
+                        <input type="checkbox" name="disabled" id="disabled" v-model="stats.disabled"
+                               @keyup.enter="stats.disabled = !stats.disabled" :aria-checked="stats.disabled">
                         <label for="disabled">Disabled</label>
                     </div>
                     <div class="labeled-check">
-                        <input type="checkbox" name="unconscious" id="unconscious" v-model="stats.unconscious">
+                        <input type="checkbox" name="unconscious" id="unconscious" v-model="stats.unconscious"
+                               @keyup.enter="stats.unconscious = !stats.unconscious" :aria-checked="stats.unconscious">
                         <label for="unconscious">Unconscious</label>
                     </div>
                     <div class="labeled-check">
-                        <input type="checkbox" name="dying" id="dying" v-model="stats.dying">
+                        <input type="checkbox" name="dying" id="dying" v-model="stats.dying"
+                               @keyup.enter="stats.dying = !stats.dying" :aria-checked="stats.dying">
                         <label for="dying">Dying</label>
                     </div>
                     <div class="labeled-check">
-                        <input type="checkbox" name="fatigued" id="fatigued" v-model="stats.fatigued">
+                        <input type="checkbox" name="fatigued" id="fatigued" v-model="stats.fatigued"
+                               @keyup.enter="stats.fatigued = !stats.fatigued" :aria-checked="stats.fatigued">
                         <label for="fatigued">Fatigued</label>
                     </div>
                     <div class="labeled-check">
-                        <input type="checkbox" name="exhausted" id="exhausted" v-model="stats.exhausted">
+                        <input type="checkbox" name="exhausted" id="exhausted" v-model="stats.exhausted"
+                               @keyup.enter="stats.exhausted = !stats.exhausted" :aria-checked="stats.exhausted">
                         <label for="exhausted">Exhausted</label>
+                    </div>
+                </div>
+
+                <div id="atk-bonuses">
+                    <div class="labeled-text">
+                        <input id="attack-bonus" type="text" name="attackBonus" size="6" :value="stats.attackBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
+                        <label for="attack-bonus">Attack Bonus</label>
+                    </div>
+                    <div class="labeled-text">
+                        <input id="melee-bonus" type="text" name="meleeBonus" size="6" :value="stats.meleeBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
+                        <label for="melee-bonus">Melee Bonus</label>
+                    </div>
+                    <div class="labeled-text">
+                        <input id="ranged-bonus" type="text" name="rangedBonus" size="6" :value="stats.rangedBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
+                        <label for="ranged-bonus">Ranged Bonus</label>
                     </div>
                 </div>
 
@@ -338,21 +367,6 @@
                             <input type="text" name="initiativeFeat" id="initiative-feat" :value="stats.initiativeFeat" @change="applyParsedChanges($event, NumberTypes.INT)">
                             <label for="initiative-feat">Feat Mod.</label>
                         </div>
-                    </div>
-                </div>
-
-                <div id="atk-bonuses">
-                    <div class="labeled-text">
-                        <input id="attack-bonus" type="text" name="attackBonus" size="8" :value="stats.attackBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
-                        <label for="attack-bonus">Attack Bonus</label>
-                    </div>
-                    <div class="labeled-text">
-                        <input id="melee-bonus" type="text" name="meleeBonus" size="8" :value="stats.meleeBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
-                        <label for="melee-bonus">Melee Bonus</label>
-                    </div>
-                    <div class="labeled-text">
-                        <input id="ranged-bonus" type="text" name="rangedBonus" size="8" :value="stats.rangedBonus" @change="applyParsedChanges($event, NumberTypes.INT)">
-                        <label for="ranged-bonus">Ranged Bonus</label>
                     </div>
                 </div>
 

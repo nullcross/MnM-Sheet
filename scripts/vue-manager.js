@@ -76,7 +76,7 @@ createApp({
             "refBase": 0, "refExtr": 0,
             "wilBase": 0, "wilExtr": 0,
 
-            "heroPoints": 0,
+            "heroPoints": 1,
             "bruises": 0, "injuries": 0,
             "staggered": false, "disabled": false,
             "unconscious": false, "dying": false,
