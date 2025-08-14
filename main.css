@@ -218,8 +218,8 @@ input[type="text"],
 .labeled-check input
 {
     appearance: none;
-    width: 1.75ex;
-    height: 1.75ex;
+    width: 1em;
+    height: 1em;
     background-color: #fff;
     border: 1px solid var(--border-light);
     border-radius: 3px;
@@ -247,6 +247,7 @@ input[type="text"],
 .labeled-check label
 {
     user-select: none;
+    flex-grow: 1;
 }
 
 /* #endregion */
@@ -856,53 +857,74 @@ input[type="text"],
     font-variation-settings: "wdth" 75;
     text-transform: uppercase;
 
-    --condition-label-size: 1.5;
-    --extra-cond-label-margin: 0.1;
-    margin: calc((1.1em + (1em * var(--extra-cond-label-margin))) * var(--condition-label-size)) 0;
+    --cond-label-font-size: 1.5;
+    --cond-label-in-margin-size: 1.2;
+    margin: calc(1em * var(--cond-label-in-margin-size) * var(--cond-label-font-size)) 0;
 
-    & .labeled-text
+    & :is(.labeled-text, .labeled-check)
     {
-        font-size: calc(1em * var(--condition-label-size));
-        margin: 0;
+        font-size: calc(1em * var(--cond-label-font-size));
+    }
+}
 
-        & input
-        {
-            text-align: center;
-        }
-        & label
-        {
-            width: 100%;
-            text-align: center;
-        }
+#conditions .labeled-text
+{
+    margin: 0;
 
-        &:nth-child(odd)
-        {
-            & input
-            {
-                border-top-width: 1px;
-            }
-            & label
-            {
-                bottom: unset;
-                top: calc(var(--label-in-margin-size) * -1 - 1em * var(--extra-cond-label-margin));
-            }
-        }
-        &:nth-child(even) label
-        {
-            bottom: calc(var(--label-in-margin-size) * -1 - 1em * var(--extra-cond-label-margin));
-        }
+    & input
+    {
+        text-align: center;
+    }
+    & label
+    {
+        width: 100%;
+        text-align: center;
     }
 
-    & .labeled-check
+    &:nth-child(odd)
     {
-        margin: auto 0;
-        font-size: 1.5em;
-
+        & input
+        {
+            border-top-width: 1px;
+        }
         & label
         {
-            margin-left: 0.25em;
-            color: var(--text-secondary);
+            bottom: unset;
+            top: calc(-1em * var(--cond-label-in-margin-size));
         }
+    }
+    &:nth-child(even) label
+    {
+        bottom: calc(-1em * var(--cond-label-in-margin-size));
+    }
+}
+
+#conditions .labeled-check
+{
+    position: relative;
+
+    & input
+    {
+        margin: 0 4ch;
+    }
+
+    & label
+    {
+        margin: 0;
+        position: absolute;
+        right: 50%;
+        transform: translateX(50%);
+
+        line-height: 1;
+        color: var(--text-secondary);
+    }
+    &:nth-child(odd) label
+    {
+        top: calc(-1em * var(--cond-label-in-margin-size));
+    }
+    &:nth-child(even) label
+    {
+        bottom: calc(-1em * var(--cond-label-in-margin-size));
     }
 }
 
@@ -913,7 +935,7 @@ input[type="text"],
 {
     display: grid;
     grid-template-rows: 1fr 1fr;
-    grid-template-areas: 
+    grid-template-areas:
         "gnral gnral"
         "melee rnged";
     align-items: center;
@@ -927,17 +949,18 @@ input[type="text"],
 
     & .labeled-text
     {
-        --label-in-margin-size: 2.1em;
+        --label-in-margin-size: 2.25em;
 
         &:first-child
         {
             grid-area: gnral;
-            --label-in-margin-size: 1.1em;
+            --label-in-margin-size: 1.25em;
         }
 
         & input
         {
             text-align: center;
+            border-top-width: 1px;
         }
         & label
         {
