@@ -560,7 +560,6 @@ input[type="text"],
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    gap: 2.5em;
     margin-top: 1.8em;
 
     & hr
