@@ -28,7 +28,7 @@
 
         <!-- #region Header -->
         <div id="sheet-header" class="row-section">
-            <h1>
+            <h1 aria-label="Hero Name">
                 <input type="text" name="name" id="hero-name" placeholder="(Hero Name)" :value="stats.name" @change="applyChanges">
             </h1>
 
@@ -100,14 +100,14 @@
         <!-- #endregion -->
 
         <!-- #region Abilities & Saves -->
-        <h1 id="ability-scores-head">Abilities & Saves</h1>
-
         <div id="ability-scores" class="row-section">
+
+            <h2 id="ability-scores-head">Abilities & Saves</h2>
 
             <div id="scores-row-1">
                 <div id="big-six">
                     <div class="score-container">
-                        <h2 class="score-title">Strength</h2>
+                        <h3 class="score-title">Strength</h3>
                         <output class="score-total" for="str-base str-extr">
                             <span>{{getScoreTotal("str")}}</span>
                             <output class="score-bonus"><span>{{"+" + getScoreBonus("str")}}</span></output>
@@ -123,7 +123,7 @@
                     </div>
 
                     <div class="score-container">
-                        <h2 class="score-title">Dexterity</h2>
+                        <h3 class="score-title">Dexterity</h3>
                         <output class="score-total" for="dex-base dex-extr">
                             <span>{{getScoreTotal("dex")}}</span>
                             <output class="score-bonus"><span>{{"+" + getScoreBonus("dex")}}</span></output>
@@ -138,7 +138,7 @@
                         </div>
                     </div>
                     <div class="score-container">
-                        <h2 class="score-title">Constitution</h2>
+                        <h3 class="score-title">Constitution</h3>
                         <output class="score-total" for="con-base con-extr">
                             <span>{{getScoreTotal("con")}}</span>
                             <output class="score-bonus"><span>{{"+" + getScoreBonus("con")}}</span></output>
@@ -153,7 +153,7 @@
                         </div>
                     </div>
                     <div class="score-container">
-                        <h2 class="score-title">Intelligence</h2>
+                        <h3 class="score-title">Intelligence</h3>
                         <output class="score-total" for="int-base int-extr">
                             <span>{{getScoreTotal("int")}}</span>
                             <output class="score-bonus"><span>{{"+" + getScoreBonus("int")}}</span></output>
@@ -168,7 +168,7 @@
                         </div>
                     </div>
                     <div class="score-container">
-                        <h2 class="score-title">Wisdom</h2>
+                        <h3 class="score-title">Wisdom</h3>
                         <output class="score-total" for="wis-base wis-extr">
                             <span>{{getScoreTotal("wis")}}</span>
                             <output class="score-bonus"><span>{{"+" + getScoreBonus("wis")}}</span></output>
@@ -183,7 +183,7 @@
                         </div>
                     </div>
                     <div class="score-container">
-                        <h2 class="score-title">Charisma</h2>
+                        <h3 class="score-title">Charisma</h3>
                         <output class="score-total" for="cha-base cha-extr">
                             <span>{{getScoreTotal("cha")}}</span>
                             <output class="score-bonus"><span>{{"+" + getScoreBonus("cha")}}</span></output>
@@ -201,7 +201,7 @@
 
                 <div id="save-scores">
                     <div class="score-container">
-                        <h2 class="score-title">Toughness</h2>
+                        <h3 class="score-title">Toughness</h3>
                         <output class="score-total" for="tou-base tou-extr">
                             <span>{{getScoreTotal("tou") + getScoreBonus("con")}}</span>
                             <div class="score-bonus"><span>CON</span></div>
@@ -217,7 +217,7 @@
                     </div>
 
                     <div class="score-container">
-                        <h2 class="score-title">Fortitude</h2>
+                        <h3 class="score-title">Fortitude</h3>
                         <output class="score-total" for="for-base for-extr">
                             <span>{{getScoreTotal("for") + getScoreBonus("con")}}</span>
                             <div class="score-bonus"><span>CON</span></div>
@@ -233,7 +233,7 @@
                     </div>
 
                     <div class="score-container">
-                        <h2 class="score-title">Reflex</h2>
+                        <h3 class="score-title">Reflex</h3>
                         <output class="score-total" for="ref-base ref-extr">
                             <span>{{getScoreTotal("ref") + getScoreBonus("dex")}}</span>
                             <div class="score-bonus"><span>DEX</span></div>
@@ -249,7 +249,7 @@
                     </div>
 
                     <div class="score-container">
-                        <h2 class="score-title">Will</h2>
+                        <h3 class="score-title">Will</h3>
                         <output class="score-total" for="wil-base wil-extr">
                             <span>{{getScoreTotal("wil") + getScoreBonus("wis")}}</span>
                             <div class="score-bonus"><span>WIS</span></div>
@@ -269,7 +269,7 @@
             <div id="scores-row-2">
 
                 <div id="hero-points-outer">
-                    <h2>Hero Points</h2>
+                    <h3 id="hero-points-label">Hero Points</h3>
                     <div id="hero-points-inner" class="invertable-svg_pseudo full-brightness">
                         <output id="hero-points" name="heroPoints" for="hero-points-sub hero-points-add">
                             <span>{{stats.heroPoints}}</span>
@@ -341,7 +341,7 @@
 
                 <div id="misc-combat">
                     <div id="defense-score" class="score-container">
-                        <h2 class="score-title">Defense</h2>
+                        <h3 class="score-title">Defense</h3>
                         <output class="score-total" for="defense-bonus extra-dodge">
                             <span>{{stats.defenseBonus + stats.extraDodge + stats.sizeBonus}}</span>
                         </output>
@@ -359,7 +359,7 @@
                         </div>
                     </div>
                     <div class="score-container">
-                        <h2 class="score-title">Initiative</h2>
+                        <h3 class="score-title">Initiative</h3>
                         <output class="score-total" for="initiative-power initiative-feat">
                             <span>{{stats.initiativePower + stats.initiativeFeat + getScoreBonus("dex")}}</span>
                             <div class="score-bonus"><span>DEX</span></div>
@@ -380,6 +380,34 @@
         </div>
         <!-- #endregion -->
 
+        <div id="skills-and-feats">
+
+            <div id="skills">
+                <div id="skills-headers" class="skills-row">
+                    <h2>Skills</h2>
+                    <h3>Ability</h3>
+                    <h3>Total</h3>
+                    <h3>Rank</h3>
+                    <h3>Modifier(s)</h3>
+                </div>
+
+                <div class="skills-row">
+                    <h4 class="skill-name trained-only">Acrobatics</h4>
+                    <span class="skill-ability">DEX</span>
+                    <output class="skill-total" for="acrobatics-rank acrobatics-mods">
+                        {{stats.acrobaticsRank + stats.acrobaticsMods + getScoreBonus("dex")}}
+                    </output>
+                    <input type="text" name="acrobaticsRank" id="acrobatics-rank" size="2" :value="stats.acrobaticsRank" @change="applyParsedChanges($event, NumberTypes.INT)">
+                    <input type="text" name="acrobaticsMods" id="acrobatics-mods" size="2" :value="stats.acrobaticsMods" @change="applyParsedChanges($event, NumberTypes.INT)">
+                </div>
+            </div>
+
+            <div id="feats">
+                <h2>Feats</h2>
+                <span>stuff will go here! promise!</span>
+            </div>
+
+        </div>
 
         <p><br><br><br><br>TEMP/TESTING</p>
         <hr>

@@ -85,6 +85,8 @@ createApp({
             "attackBonus": 0, "meleeBonus": 0, "rangedBonus": 0,
             "defenseBonus": 0, "extraDodge": 0, "sizeBonus": 0,
             "initiativePower": 0, "initiativeFeat": 0,
+
+            "acrobaticsRank": 0, "acrobaticsMods": 0,
         });
 
 

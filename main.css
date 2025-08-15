@@ -192,6 +192,10 @@ h1, h2, h3, h4, h5, h6
     font-variation-settings: "wdth" 75;
     text-transform: uppercase;
 }
+h2
+{
+    font-size: 1.8em;
+}
 
 input[type="text"],
 .labeled-text output
@@ -299,13 +303,7 @@ input[type="text"],
 {
     display: grid;
     margin-top: 1em;
-}
-
-.sheet-row
-{
-    display: flex;
-    flex-direction: row;
-    align-items: end;
+    gap: 0.5em;
 }
 
 .labeled-text
@@ -540,12 +538,11 @@ input[type="text"],
 /* #endregion */
 
 
-/* #region Ability Scores */
+/* #region Abilities & Saves */
 
 #ability-scores-head
 {
     margin-bottom: 0.5em;
-    margin: 0.5em 0;
 }
 
 #scores-row-1
@@ -747,14 +744,14 @@ input[type="text"],
     font-weight: 600;
     font-variation-settings: "wdth" 75;
     text-transform: uppercase;
+}
 
-    & > h2
-    {
-        order: 1;
-        margin-top: 0.2em;
-        font-size: 1.8em;
-        text-align: center;
-    }
+#hero-points-label
+{
+    order: 1;
+    margin-top: 0.2em;
+    font-size: 1.8em;
+    text-align: center;
 }
 
 #hero-points-inner
@@ -1005,5 +1002,75 @@ input[type="text"],
 /* #endregion */
 
 /* #endregion */
+
+/* #endregion */
+
+/* #region Skills & Feats */
+
+#skills-and-feats
+{
+    margin-top: 2em;
+
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2em;
+}
+
+#skills-headers
+{
+    margin-bottom: 0.6em;
+}
+#skills-headers > *
+{
+    align-self: flex-end;
+
+    &:nth-child(n+2)
+    {
+        font-size: 1.17em;
+        color: var(--text-secondary);
+    }
+}
+
+.skills-row
+{
+    display: grid;
+    grid-template-rows: 100%;
+    grid-template-columns: auto 8ch 6ch 6ch 10ch;
+    gap: 1em;
+    align-items: center;
+
+    & > *:nth-child(n+2)
+    {
+        text-align: center;
+
+        font-family: var(--font-header);
+        font-weight: 600;
+        font-variation-settings: "wdth" 75;
+        text-transform: uppercase;
+    }
+}
+
+.skill-name
+{
+    font-size: 1.3em;
+}
+.skill-ability
+{
+    font-size: 1.17em;
+}
+
+.skill-ability
+{
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 100%;
+    margin: auto;
+    padding: 0 0.25ch;
+}
+
+.skill-total
+{
+    border: 3px double var(--border-light);
+}
 
 /* #endregion */
