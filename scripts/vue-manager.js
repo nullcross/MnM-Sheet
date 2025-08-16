@@ -85,8 +85,37 @@ createApp({
             "attackBonus": 0, "meleeBonus": 0, "rangedBonus": 0,
             "defenseBonus": 0, "extraDodge": 0, "sizeBonus": 0,
             "initiativePower": 0, "initiativeFeat": 0,
+        });
 
-            "acrobaticsRank": 0, "acrobaticsMods": 0,
+        const skills = ref({
+            "acrobatics": { "displayName": "Acrobatics", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
+            "bluff": { "displayName": "Bluff", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "climb": { "displayName": "Climb", "ability": "str", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "computers": { "displayName": "Computers", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
+            "concentration": { "displayName": "Concentration", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "craft": { "displayName": "Craft", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": [], },
+            "diplomacy": { "displayName": "Diplomacy", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "disableDevice": { "displayName": "Disable Device", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
+            "disguise": { "displayName": "Disguise", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "drive": { "displayName": "Drive", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
+            "escape": { "displayName": "Escape Artist", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "gatherInfo": { "displayName": "Gather Info", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "handleAnimal": { "displayName": "Handle Animal", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "intimidate": { "displayName": "Intimidate", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "knowledge": { "displayName": "Knowledge", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": [], },
+            "language": { "displayName": "Language", "ability": " - ", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
+            "medicine": { "displayName": "Medicine", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "notice": { "displayName": "Notice", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "perform": { "displayName": "Perform", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": [], },
+            "pilot": { "displayName": "Pilot", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
+            "profession": { "displayName": "Profession", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": [], },
+            "ride": { "displayName": "Ride", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
+            "search": { "displayName": "Search", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "sense": { "displayName": "Sense Motive", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "sleight": { "displayName": "Sleight of Hand", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
+            "stealth": { "displayName": "Stealth", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "survival": { "displayName": "Survival", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "swim": { "displayName": "Swim", "ability": "str", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
         });
 
 
@@ -121,7 +150,7 @@ createApp({
         function applyChanges(e) { stats.value[e.target.name] = e.target.value; console.log(e.target) }
 
 
-        function applyParsedChanges(e, parseType, allowUnparseable = true)
+        function applyParsedChanges(e, destination, parseType, allowUnparseable = true)
         {
             let parser;
             switch (parseType)
@@ -141,18 +170,24 @@ createApp({
             // If parse was successful (result is a non-NaN number), apply that to stats
             if (!Number.isNaN(+parseAttempt))
             {
-                stats.value[e.target.name] = parseAttempt;
+                destination[e.target.name] = parseAttempt;
             }
-            // If it wasn't, don't do anything unless we allow unparsable entries
+            // If it wasn't, reset to saved value unless we allow unparsable entries
             else if (allowUnparseable)
             {
-                stats.value[e.target.name] = e.target.value;
+                destination[e.target.name] = e.target.value;
+            }
+            else
+            {
+                e.target.value = destination[e.target.name];
             }
         }
 
 
         function getScoreTotal(scoreAbbrv)
         {
+            if (!scoreAbbrv || scoreAbbrv.trim() === "-") return 0;
+
             const baseKey = scoreAbbrv + "Base"
             const extrKey = scoreAbbrv + "Extr"
             return stats.value[baseKey] + stats.value[extrKey];
@@ -160,6 +195,8 @@ createApp({
 
         function getScoreBonus(scoreAbbrv)
         {
+            if (!scoreAbbrv || scoreAbbrv.trim() === "-") return 0;
+
             const baseKey = scoreAbbrv + "Base"
             const extrKey = scoreAbbrv + "Extr"
             return Math.floor((stats.value[baseKey] + stats.value[extrKey] - 10) / 2);
@@ -175,6 +212,7 @@ createApp({
         return {
             NumberTypes,
             stats,
+            skills,
             formatNumber,
 
             setTheme,

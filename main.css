@@ -355,12 +355,6 @@ input[type="text"],
 #sheet-header
 {
     display: grid;
-    /* grid-template-columns: auto 1fr;
-    grid-template-rows: repeat(3, auto);
-    grid-template-areas:
-        "a c"
-        "b d"
-        "e e"; */
     grid-template-columns: auto 1em 1fr;
     grid-template-rows: auto auto 0.5em auto;
     grid-template-areas:
@@ -523,7 +517,7 @@ input[type="text"],
     background-repeat: no-repeat;
     background-position: center;
 
-    transition: rotate 0.2s ease-out;
+    transition: rotate 0.3s cubic-bezier(.33, 1.5, .67, .9);
     transform-origin: top;
 
     &[value="false"]
@@ -1012,13 +1006,20 @@ input[type="text"],
     margin-top: 2em;
 
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 2fr 5fr;
     gap: 2em;
+}
+
+#skills
+{
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
 }
 
 #skills-headers
 {
-    margin-bottom: 0.6em;
+    margin-bottom: 0.3em;
 }
 #skills-headers > *
 {
@@ -1026,7 +1027,7 @@ input[type="text"],
 
     &:nth-child(n+2)
     {
-        font-size: 1.17em;
+        font-size: 1em;
         color: var(--text-secondary);
     }
 }
@@ -1035,8 +1036,8 @@ input[type="text"],
 {
     display: grid;
     grid-template-rows: 100%;
-    grid-template-columns: auto 8ch 6ch 6ch 10ch;
-    gap: 1em;
+    grid-template-columns: auto repeat(4, 6ch);
+    gap: 0.5em;
     align-items: center;
 
     & > *:nth-child(n+2)
@@ -1053,24 +1054,64 @@ input[type="text"],
 .skill-name
 {
     font-size: 1.3em;
+    width: fit-content;
 }
 .skill-ability
 {
     font-size: 1.17em;
-}
 
-.skill-ability
-{
     color: var(--text-secondary);
     border: 1px solid var(--border-light);
     border-radius: 100%;
-    margin: auto;
-    padding: 0 0.25ch;
-}
 
+    margin: auto;
+    min-width: 3.25ch;
+}
 .skill-total
 {
     border: 3px double var(--border-light);
+}
+
+.trained-only .skill-name
+{
+    position: relative;
+    &::after
+    {
+        content: "*";
+        /* font: initial;
+        font-family: monospace;
+        text-transform: none; */
+
+        display: inline-block;
+        position: absolute;
+        right: -1ch;
+        top: -0.1em;
+    }
+}
+
+.skill-name, .skill-total,
+.skill-rank, .skill-mods
+{
+    transition: opacity 0.5s cubic-bezier(.33, 1.5, .67, .9);
+}
+.trained-only.untrained
+{
+    & .skill-name
+    {
+        opacity: 0.4;
+    }
+    & .skill-total
+    {
+        opacity: 0.2;
+    }
+}
+.untrained
+{
+    & .skill-rank,
+    & .skill-mods
+    {
+        color: color-mix(in oklab, currentColor 33%, transparent);
+    }
 }
 
 /* #endregion */
