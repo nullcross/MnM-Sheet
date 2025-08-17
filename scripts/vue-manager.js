@@ -42,80 +42,103 @@ function formatNumber(num) { return typeof num === "number" ? Intl.NumberFormat(
 
 // #endregion
 
+// #region Data Classes
 
+class Score 
+{
+    constructor(displayName, base = 0, extr = 0, moddedBy = null) 
+    {
+        this.displayName = displayName;
+        this.base = base ?? 0; this.extr = extr ?? 0;
+        this.moddedBy = moddedBy;
+    }
+}
+
+class Skill
+{
+    constructor(displayName, ability, rank = 0, mods = 0, trainedOnly = false, multiples = null)
+    {
+        this.displayName = displayName; this.ability = ability;
+        this.rank = rank ?? 0; this.mods = mods ?? 0;
+        this.trainedOnly = trainedOnly ?? false;
+        this.multiples = multiples;
+    }
+}
+
+// #endregion
 
 createApp({
     setup()
     {
         const currentDisplayMode = ref(window.matchMedia("(prefers-color-scheme: dark)").matches ? themes[1] : themes[0]);
 
-        const stats = ref({
+        const info = ref({
             "name": "",
-            "altIdentity": "",
-            "identSecrecy": true,
+            "altIdentity": "", "identSecrecy": true,
             "powerLevel": 1,
-            "affiliation": "",
-            "base": "",
-            "debut": "",
-            "size": "",
-            "height": "",
-            "age": "",
-            "weight": "",
-            "eyes": "",
-            "hair": "",
-
-            "strBase": 10, "strExtr": 0,
-            "dexBase": 10, "dexExtr": 0,
-            "conBase": 10, "conExtr": 0,
-            "intBase": 10, "intExtr": 0,
-            "wisBase": 10, "wisExtr": 0,
-            "chaBase": 10, "chaExtr": 0,
-
-            "touBase": 0, "touExtr": 0,
-            "forBase": 0, "forExtr": 0,
-            "refBase": 0, "refExtr": 0,
-            "wilBase": 0, "wilExtr": 0,
-
-            "heroPoints": 1,
-            "bruises": 0, "injuries": 0,
-            "staggered": false, "disabled": false,
-            "unconscious": false, "dying": false,
-            "fatigued": false, "exhausted": false,
-
-            "attackBonus": 0, "meleeBonus": 0, "rangedBonus": 0,
-            "defenseBonus": 0, "extraDodge": 0, "sizeBonus": 0,
-            "initiativePower": 0, "initiativeFeat": 0,
+            "affiliation": "", "base": "", "debut": "",
+            "size": 0, "height": "", "age": "",
+            "weight": "", "eyes": "", "hair": "",
         });
 
+        const stats = ref({
+            main: {
+                "str": new Score("Strength", 10),
+                "dex": new Score("Dexterity", 10),
+                "con": new Score("Constitution", 10),
+                "int": new Score("Intelligence", 10),
+                "wis": new Score("Wisdom", 10),
+                "cha": new Score("Charisma", 10),
+            },
+            saves: {
+                "tou": new Score("Toughness", 0, 0, "con"),
+                "for": new Score("Fortitude", 0, 0, "con"),
+                "ref": new Score("Reflex", 0, 0, "dex"),
+                "wil": new Score("Will", 0, 0, "wis"),
+            },
+            conditions: {
+                "staggered": false, "disabled": false,
+                "unconscious": false, "dying": false,
+                "fatigued": false, "exhausted": false,
+            },
+            other: {
+                "heroPoints": 1,
+                "bruises": 0, "injuries": 0,
+                "attackBonus": 0, "meleeBonus": 0, "rangedBonus": 0,
+                "defenseBonus": 0, "extraDodge": 0,
+                "initiativePower": 0, "initiativeFeat": 0,
+            },
+        })
+
         const skills = ref({
-            "acrobatics": { "displayName": "Acrobatics", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
-            "bluff": { "displayName": "Bluff", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "climb": { "displayName": "Climb", "ability": "str", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "computers": { "displayName": "Computers", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
-            "concentration": { "displayName": "Concentration", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "craft": { "displayName": "Craft", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": [], },
-            "diplomacy": { "displayName": "Diplomacy", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "disableDevice": { "displayName": "Disable Device", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
-            "disguise": { "displayName": "Disguise", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "drive": { "displayName": "Drive", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
-            "escape": { "displayName": "Escape Artist", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "gatherInfo": { "displayName": "Gather Info", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "handleAnimal": { "displayName": "Handle Animal", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "intimidate": { "displayName": "Intimidate", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "knowledge": { "displayName": "Knowledge", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": [], },
-            "language": { "displayName": "Language", "ability": " - ", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
-            "medicine": { "displayName": "Medicine", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "notice": { "displayName": "Notice", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "perform": { "displayName": "Perform", "ability": "cha", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": [], },
-            "pilot": { "displayName": "Pilot", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
-            "profession": { "displayName": "Profession", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": [], },
-            "ride": { "displayName": "Ride", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
-            "search": { "displayName": "Search", "ability": "int", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "sense": { "displayName": "Sense Motive", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "sleight": { "displayName": "Sleight of Hand", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": true, "multiples": null, },
-            "stealth": { "displayName": "Stealth", "ability": "dex", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "survival": { "displayName": "Survival", "ability": "wis", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
-            "swim": { "displayName": "Swim", "ability": "str", "rank": 0, "mods": 0, "trainedOnly": false, "multiples": null, },
+            "acrobatics": new Skill("Acrobatics", "dex", 0, 0, true),
+            "bluff": new Skill("Bluff", "cha"),
+            "climb": new Skill("Climb", "str"),
+            "computers": new Skill("Computers", "int", 0, 0, true),
+            "concentration": new Skill("Concentration", "wis"),
+            "craft": new Skill("Craft", "int", 0, 0, true, []),
+            "diplomacy": new Skill("Diplomacy", "cha"),
+            "disableDevice": new Skill("Disable Device", "int", 0, 0, true),
+            "disguise": new Skill("Disguise", "cha"),
+            "drive": new Skill("Drive", "dex", 0, 0, true),
+            "escape": new Skill("Escape Artist", "dex"),
+            "gatherInfo": new Skill("Gather Info", "cha"),
+            "handleAnimal": new Skill("Handle Animal", "cha"),
+            "intimidate": new Skill("Intimidate", "cha"),
+            "knowledge": new Skill("Knowledge", "int", 0, 0, true, []),
+            "language": new Skill("Language", " - ", 0, 0, true),
+            "medicine": new Skill("Medicine", "wis"),
+            "notice": new Skill("Notice", "wis"),
+            "perform": new Skill("Perform", "cha", 0, 0, true, []),
+            "pilot": new Skill("Pilot", "dex", 0, 0, true),
+            "profession": new Skill("Profession", "wis", 0, 0, true, []),
+            "ride": new Skill("Ride", "dex", 0, 0, true),
+            "search": new Skill("Search", "int"),
+            "sense": new Skill("Sense Motive", "wis"),
+            "sleight": new Skill("Sleight of Hand", "dex", 0, 0, true),
+            "stealth": new Skill("Stealth", "dex"),
+            "survival": new Skill("Survival", "wis"),
+            "swim": new Skill("Swim", "str"),
         });
 
 
@@ -147,7 +170,10 @@ createApp({
         }
 
 
-        function applyChanges(e) { stats.value[e.target.name] = e.target.value; console.log(e.target) }
+        function applyChanges(e, destination) 
+        {
+            destination[e.target.name] = e.target.value;
+        }
 
 
         function applyParsedChanges(e, destination, parseType, allowUnparseable = true)
@@ -188,18 +214,15 @@ createApp({
         {
             if (!scoreAbbrv || scoreAbbrv.trim() === "-") return 0;
 
-            const baseKey = scoreAbbrv + "Base"
-            const extrKey = scoreAbbrv + "Extr"
-            return stats.value[baseKey] + stats.value[extrKey];
+            const targetScore = stats.value.main[scoreAbbrv] ?? stats.value.saves[scoreAbbrv] ?? stats.value.other[scoreAbbrv];
+            return targetScore?.base + targetScore?.extr;
         }
 
         function getScoreBonus(scoreAbbrv)
         {
             if (!scoreAbbrv || scoreAbbrv.trim() === "-") return 0;
 
-            const baseKey = scoreAbbrv + "Base"
-            const extrKey = scoreAbbrv + "Extr"
-            return Math.floor((stats.value[baseKey] + stats.value[extrKey] - 10) / 2);
+            return Math.floor((getScoreTotal(scoreAbbrv) - 10) / 2);
         }
 
 
@@ -211,6 +234,7 @@ createApp({
 
         return {
             NumberTypes,
+            info,
             stats,
             skills,
             formatNumber,
