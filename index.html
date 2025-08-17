@@ -93,12 +93,16 @@
                     <label for="hero-height">Height</label>
                 </div>
                 <div class="labeled-text">
+                    <input type="text" name="weight" id="hero-weight" :value="info.weight" @change="applyChanges($event, info)">
+                    <label for="hero-weight">Weight</label>
+                </div>
+                <div class="labeled-text">
                     <input type="text" name="age" id="hero-age" :value="info.age" @change="applyChanges($event, info)">
                     <label for="hero-age">Age</label>
                 </div>
                 <div class="labeled-text">
-                    <input type="text" name="weight" id="hero-weight" :value="info.weight" @change="applyChanges($event, info)">
-                    <label for="hero-weight">Weight</label>
+                    <input type="text" name="skin" id="hero-skin" :value="info.skin" @change="applyChanges($event, info)">
+                    <label for="hero-skin">Skin</label>
                 </div>
                 <div class="labeled-text">
                     <input type="text" name="eyes" id="hero-eyes" :value="info.eyes" @change="applyChanges($event, info)">
@@ -112,13 +116,13 @@
         </div>
         <!-- #endregion -->
 
-        <!-- #region Abilities & Saves -->
+        <!-- #region Misc Scores -->
         <div id="ability-scores" class="row-section">
 
             <h2 id="ability-scores-head">Abilities & Saves</h2>
 
             <div id="scores-row-1">
-                <div id="big-six">
+                <div id="big-six" class="score-array">
 
                     <div class="score-container" v-for="(scVal, scName) of stats.main">
                         <h3 class="score-title">{{ scVal.displayName }}</h3>
@@ -140,7 +144,7 @@
 
                 </div>
 
-                <div id="save-scores">
+                <div id="save-scores" class="score-array">
 
                     <div class="score-container" v-for="(svVal, svName) of stats.saves">
                         <h3 class="score-title">{{ svVal.displayName }}</h3>
@@ -192,6 +196,7 @@
                         <label for="injuries">Injuries</label>
                     </div>
                     <div class="labeled-check" v-for="(cnVal, cnName) of stats.conditions">
+                        <div class="cond-backdrop" aria-hidden="true" @click="stats.conditions[cnName] = !cnVal"></div>
                         <input type="checkbox" :name="cnName" :id="cnName" v-model="stats.conditions[cnName]"
                                @keyup.enter="stats.conditions[cnName] = !cnVal" :aria-checked="cnVal">
                         <label :for="cnName">{{ cnName }}</label>
@@ -216,7 +221,7 @@
                     </div>
                 </div>
 
-                <div id="misc-combat">
+                <div id="misc-combat" class="score-array">
 
                     <div class="score-container">
                         <h3 class="score-title">Defense</h3>
@@ -237,7 +242,7 @@
                         <div class="labeled-text extr-container">
                             <input type="text" name="extraDodge" id="extra-dodge" :value="stats.other.extraDodge"
                                    @change="applyParsedChanges($event, stats.other, NumberTypes.INT, false)">
-                            <label for="extra-dodge">Extr. Dodge</label>
+                            <label for="extra-dodge">Extra Dodge</label>
                         </div>
                     </div>
 
@@ -250,12 +255,12 @@
                         <div class="labeled-text base-container">
                             <input type="text" name="initiativePower" id="initiative-power" :value="stats.other.initiativePower"
                                    @change="applyParsedChanges($event, stats.other, NumberTypes.INT, false)">
-                            <label for="initiative-power">Power Mod.</label>
+                            <label for="initiative-power">Power Modifier</label>
                         </div>
                         <div class="labeled-text extr-container">
                             <input type="text" name="initiativeFeat" id="initiative-feat" :value="stats.other.initiativeFeat"
                                    @change="applyParsedChanges($event, stats.other, NumberTypes.INT, false)">
-                            <label for="initiative-feat">Feat Mod.</label>
+                            <label for="initiative-feat">Feat Modifier</label>
                         </div>
 
                     </div>

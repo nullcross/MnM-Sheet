@@ -77,8 +77,8 @@ createApp({
             "altIdentity": "", "identSecrecy": true,
             "powerLevel": 1,
             "affiliation": "", "base": "", "debut": "",
-            "size": 0, "height": "", "age": "",
-            "weight": "", "eyes": "", "hair": "",
+            "size": 0, "height": "", "weight": "",
+            "age": "", "skin": "", "eyes": "", "hair": "",
         });
 
         const stats = ref({

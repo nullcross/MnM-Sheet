@@ -107,6 +107,7 @@ html, html.light
     --background-primary: #eee;
     --border-light: #a9aaad;
     --border-faint: color-mix(in oklab, var(--border-light) 75%, transparent);
+    --border-ghost: color-mix(in oklab, var(--border-light) 25%, transparent);
 
     --button-hover: #d0d0d7;
     --button-pressed: #b1b1b9;
@@ -194,7 +195,7 @@ h1, h2, h3, h4, h5, h6
 }
 h2
 {
-    font-size: 1.8em;
+    font-size: 2.3rem;
 }
 
 input[type="text"],
@@ -250,7 +251,6 @@ input[type="text"],
 }
 .labeled-check label
 {
-    user-select: none;
     flex-grow: 1;
 }
 
@@ -302,8 +302,8 @@ input[type="text"],
 #sheet-grid
 {
     display: grid;
-    margin-top: 1em;
-    gap: 0.5em;
+    margin-top: 1rem;
+    gap: 2.5rem;
 }
 
 .labeled-text
@@ -350,6 +350,7 @@ input[type="text"],
 /* #endregion */
 
 
+
 /* #region Sheet Header */
 
 #sheet-header
@@ -373,6 +374,24 @@ input[type="text"],
         font-weight: 600;
         font-variation-settings: "wdth" 75;
         font-variant: small-caps;
+
+        &#hero-name
+        {
+            font-size: 3.5rem;
+        }
+        &#hero-identity
+        {
+            font-size: 2.2rem;
+        }
+        &#hero-size
+        {
+            font-size: 2em;
+        }
+    }
+
+    label
+    {
+        font-size: 1.1em;
     }
 
     & .labeled-button
@@ -520,7 +539,7 @@ input[type="text"],
     grid-area: e;
     display: grid;
     grid-auto-flow: column;
-    
+
     gap: 1em;
     grid-auto-columns: 1fr;
 
@@ -535,7 +554,7 @@ input[type="text"],
 {
     background-color: var(--background-primary);
     color: var(--text-primary);
-    
+
     border: 1px dashed var(--text-secondary);
     border-width: 1px 0px 1px 0px;
 
@@ -554,6 +573,11 @@ input[type="text"],
 
 
 /* #region Abilities & Saves */
+
+#ability-scores
+{
+    margin-top: -0.4em;
+}
 
 #ability-scores-head
 {
@@ -587,9 +611,9 @@ input[type="text"],
     }
 }
 
-/* #region Row 1 */
+/* #region Score Arrays/Containers */
 
-#big-six
+.score-array
 {
     display: flex;
     flex-direction: row;
@@ -636,9 +660,9 @@ input[type="text"],
     {
         width: 100%;
         text-align: center;
+        font-size: 1rem;
     }
 }
-
 
 .score-total
 {
@@ -692,8 +716,10 @@ input[type="text"],
 
 .score-title
 {
-    margin: 0.2em auto 0.3em;
+    margin: 0.4em auto;
     text-align: center;
+
+    font-size: 1.4em;
     color: var(--text-primary);
 }
 
@@ -710,16 +736,16 @@ input[type="text"],
 #save-scores,
 #misc-combat
 {
-    font-size: 0.85em;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    font-size: 0.9em;
 
     & .score-container
     {
         column-gap: 0.6em;
         margin-top: auto;
+    }
+    & .score-title
+    {
+        margin: 0.3em auto;
     }
 
     & .score-total
@@ -745,8 +771,6 @@ input[type="text"],
 }
 
 /* #endregion */
-
-/* #region Row 2 */
 
 /* #region Hero Points */
 
@@ -873,7 +897,7 @@ input[type="text"],
     grid-template-rows: 1fr 1fr;
     grid-template-columns: repeat(4, auto);
     grid-auto-flow: column;
-    gap: 0 1.5em;
+    gap: 0 0.8em;
 
     font-family: var(--font-header);
     font-weight: 600;
@@ -893,6 +917,7 @@ input[type="text"],
 #conditions .labeled-text
 {
     margin: 0;
+    margin-right: 0.3em;
 
     & input
     {
@@ -950,6 +975,15 @@ input[type="text"],
         bottom: calc(-1em * var(--cond-label-in-margin-size));
     }
 }
+#conditions .cond-backdrop
+{
+    user-select: none;
+    position: absolute;
+    inset: 0.25em 0;
+
+    background: var(--border-ghost);
+    border-radius: 6px;
+}
 
 /* #endregion */
 
@@ -1003,6 +1037,10 @@ input[type="text"],
     {
         margin: auto;
     }
+    & .labeled-text
+    {
+        --label-in-margin-size: 2.22em
+    }
 }
 
 #defense-score
@@ -1018,14 +1056,11 @@ input[type="text"],
 
 /* #endregion */
 
-/* #endregion */
 
 /* #region Skills & Feats */
 
 #skills-and-feats
 {
-    margin-top: 2em;
-
     display: grid;
     grid-template-columns: 2fr 5fr;
     gap: 2em;
@@ -1099,10 +1134,6 @@ input[type="text"],
     &::after
     {
         content: "*";
-        /* font: initial;
-        font-family: monospace;
-        text-transform: none; */
-
         display: inline-block;
         position: absolute;
         right: -1ch;
