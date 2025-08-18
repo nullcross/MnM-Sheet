@@ -56,12 +56,12 @@ class Score
 
 class Skill
 {
-    constructor(displayName, ability, rank = 0, mods = 0, trainedOnly = false, multiples = null)
+    constructor(displayName, ability, rank = 0, mods = 0, trainedOnly = false, subtype = null, multiples = [])
     {
         this.displayName = displayName; this.ability = ability;
         this.rank = rank ?? 0; this.mods = mods ?? 0;
         this.trainedOnly = trainedOnly ?? false;
-        this.multiples = multiples;
+        this.subtype = subtype; this.multiples = multiples;
     }
 }
 
@@ -116,7 +116,7 @@ createApp({
             "climb": new Skill("Climb", "str"),
             "computers": new Skill("Computers", "int", 0, 0, true),
             "concentration": new Skill("Concentration", "wis"),
-            "craft": new Skill("Craft", "int", 0, 0, true, []),
+            "craft": new Skill("Craft", "int", 0, 0, true, ""),
             "diplomacy": new Skill("Diplomacy", "cha"),
             "disableDevice": new Skill("Disable Device", "int", 0, 0, true),
             "disguise": new Skill("Disguise", "cha"),
@@ -125,13 +125,13 @@ createApp({
             "gatherInfo": new Skill("Gather Info", "cha"),
             "handleAnimal": new Skill("Handle Animal", "cha"),
             "intimidate": new Skill("Intimidate", "cha"),
-            "knowledge": new Skill("Knowledge", "int", 0, 0, true, []),
+            "knowledge": new Skill("Knowledge", "int", 0, 0, true, ""),
             "language": new Skill("Language", " - ", 0, 0, true),
             "medicine": new Skill("Medicine", "wis"),
             "notice": new Skill("Notice", "wis"),
-            "perform": new Skill("Perform", "cha", 0, 0, true, []),
+            "perform": new Skill("Perform", "cha", 0, 0, true, ""),
             "pilot": new Skill("Pilot", "dex", 0, 0, true),
-            "profession": new Skill("Profession", "wis", 0, 0, true, []),
+            "profession": new Skill("Profession", "wis", 0, 0, true, ""),
             "ride": new Skill("Ride", "dex", 0, 0, true),
             "search": new Skill("Search", "int"),
             "sense": new Skill("Sense Motive", "wis"),

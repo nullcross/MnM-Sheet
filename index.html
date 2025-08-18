@@ -133,12 +133,12 @@
                         <div class="labeled-text base-container">
                             <input type="text" name="base" :id="scName + '-base'" :value="scVal.base"
                                    @change="applyParsedChanges($event, stats.main[scName], NumberTypes.INT, false)">
-                            <label for="str-base">Base</label>
+                            <label :for="scName + '-base'">Base</label>
                         </div>
                         <div class="labeled-text extr-container">
                             <input type="text" name="extr" :id="scName + '-extr'" :value="scVal.extr"
                                    @change="applyParsedChanges($event, stats.main[scName], NumberTypes.INT, false)">
-                            <label for="str-extr">Enhanced</label>
+                            <label :for="scName + '-extr'">Enhanced</label>
                         </div>
                     </div>
 
@@ -155,12 +155,12 @@
                         <div class="labeled-text base-container">
                             <input type="text" name="base" :id="svName + '-base'" :value="svVal.base"
                                    @change="applyParsedChanges($event, stats.saves[svName], NumberTypes.INT, false)">
-                            <label for="tou-base">Base Mod.</label>
+                            <label :for="svName + '-base'">Base Mod.</label>
                         </div>
                         <div class="labeled-text extr-container">
                             <input type="text" name="extr" :id="svName + '-extr'" :value="svVal.extr"
                                    @change="applyParsedChanges($event, stats.saves[svName], NumberTypes.INT, false)">
-                            <label for="tou-extr">Misc. Mod.</label>
+                            <label :for="svName + '-extr'">Misc. Mod.</label>
                         </div>
                     </div>
 
@@ -282,8 +282,15 @@
                     <h3>Extras</h3>
                 </div>
 
-                <div class="skills-row" v-for="(skVal, skNme) of skills" :class="{ 'trained-only':skVal.trainedOnly, 'untrained':skVal.rank < 1 }">
-                    <h4 class="skill-name" :aria-label="skVal.trainedOnly ? 'Trained Only' : null">{{ skVal.displayName }}</h4>
+                <div class="skills-row" v-for="(skVal, skNme) of skills"
+                     :class="{ 'trained-only':skVal.trainedOnly, 'untrained':skVal.rank < 1, 'has-subtype':skVal.subtype !== null }">
+
+                    <h4 class="skill-name" :aria-label="skVal.trainedOnly ? 'Trained Only' : null">
+                        <span>{{ skVal.displayName }}</span>
+                        <input type="text" name="subtype" :id="skNme + '-subtype'" v-if="skVal.subtype !== null"
+                               :value="skVal.subtype" @change="applyChanges($event, skVal)">
+                    </h4>
+
                     <span class="skill-ability">{{ skVal.ability }}</span>
                     <output class="skill-total" :for="skNme + '-rank ' + skNme + '-mods'">
                         {{ skVal.rank + skVal.mods + getScoreBonus(skVal.ability) }}
@@ -292,6 +299,11 @@
                            @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
                     <input type="text" name="mods" :id="skNme + '-mods'" class="skill-mods" size="2" :value="skVal.mods"
                            @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
+
+                    <div class="subtype-buttons" v-if="skVal.subtype !== null">
+                        <button type="button" :id="'add-' + skNme" :aria-level="'Subtract ' + skVal.displayName + ' Subtype'">-</button>
+                        <button type="button" :id="'add-' + skNme" :aria-level="'Add ' + skVal.displayName + ' Subtype'">+</button>
+                    </div>
                 </div>
             </div>
 

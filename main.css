@@ -238,6 +238,7 @@ input[type="text"],
         &::after
         {
             content: "✓";
+            color: #fff;
             font-family: monospace;
             font-size: 0.9em;
             line-height: 1;
@@ -245,7 +246,7 @@ input[type="text"],
             position: absolute;
             right: 50%;
             bottom: 50%;
-            transform: translate(50%, 50%);
+            transform: translate(50%, calc(50% + 1px));
         }
     }
 }
@@ -258,13 +259,16 @@ input[type="text"],
 
 /* #region Meta UI */
 
+#meta-ui
+{
+    position: fixed;
+    top: 0;
+    right: 4em;
+}
+
 #toggle-theme
 {
     --bottom-radius: 6px;
-
-    position: absolute;
-    top: 0;
-    right: 4em;
 
     width: 2em;
     height: 2em;
@@ -811,60 +815,59 @@ input[type="text"],
         background-image: url("./media/sun-3-svgrepo-com.svg");
         background-size: 100% 100%;
     }
+}
+#hero-points-inner button
+{
+    width: 3ch;
+    height: 3ch;
+    padding: 0;
 
-    & button
+    font-size: 1.5em;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: normal;
+    color: color-mix(in oklab, var(--text-primary) 80%, transparent);
+
+    background-color: color-mix(in oklab, var(--background-primary) 66%, transparent);
+    border: 1px solid color-mix(in oklab, currentColor 80%, transparent);
+    border-radius: 100%;
+
+    position: absolute;
+    bottom: 0;
+
+    &:nth-of-type(odd)
     {
-        width: 3ch;
-        height: 3ch;
-        padding: 0;
+        left: 0;
+    }
+    &:nth-of-type(even)
+    {
+        right: 0;
+    }
 
-        font-size: 1.5em;
-        font-family: 'Courier New', Courier, monospace;
-        font-weight: bold;
-        color: color-mix(in oklab, var(--text-primary) 80%, transparent);
-
-        background-color: color-mix(in oklab, var(--background-primary) 66%, transparent);
-        border: 1px solid color-mix(in oklab, currentColor 80%, transparent);
-        border-radius: 100%;
-
-        position: absolute;
-        bottom: 0;
-
-        &:nth-of-type(odd)
+    &:focus, &:hover
+    {
+        &:not(:disabled)
         {
-            left: 0;
+            color: var(--text-primary);
+            background-color: color-mix(in oklab, var(--background-primary) 85%, transparent);
         }
-        &:nth-of-type(even)
-        {
-            right: 0;
-        }
-
-        &:focus, &:hover
-        {
-            &:not(:disabled)
-            {
-                color: var(--text-primary);
-                background-color: color-mix(in oklab, var(--background-primary) 85%, transparent);
-            }
-        }
-        &:active
-        {
-            /* Somewhat redundant, but keeps specificity in line with above */
-            &:not(:disabled)
-            {
-                color: var(--text-secondary);
-                background-color: var(--background-primary);
-            }
-            &:disabled
-            {
-                color: color-mix(in oklab, var(--text-secondary) 75%, black);
-            }
-        }
-
-        &:disabled
+    }
+    &:active
+    {
+        /* Somewhat redundant, but keeps specificity in line with above */
+        &:not(:disabled)
         {
             color: var(--text-secondary);
+            background-color: var(--background-primary);
         }
+        &:disabled
+        {
+            color: color-mix(in oklab, var(--text-secondary) 75%, black);
+        }
+    }
+
+    &:disabled
+    {
+        color: var(--text-secondary);
     }
 }
 
@@ -1096,6 +1099,8 @@ input[type="text"],
     gap: 0.5em;
     align-items: center;
 
+    position: relative;
+
     & > *:nth-child(n+2)
     {
         text-align: center;
@@ -1128,9 +1133,10 @@ input[type="text"],
     border: 3px double var(--border-light);
 }
 
-.trained-only .skill-name
+.trained-only .skill-name span
 {
     position: relative;
+
     &::after
     {
         content: "*";
@@ -1148,7 +1154,8 @@ input[type="text"],
 }
 .trained-only.untrained
 {
-    & .skill-name
+    & .skill-name,
+    & .subtype-buttons
     {
         opacity: 0.4;
     }
@@ -1165,5 +1172,103 @@ input[type="text"],
         color: color-mix(in oklab, currentColor 33%, transparent);
     }
 }
+
+/* #region Subtypes */
+
+.skills-row
+{
+    --subtype-buttons-in-margin-size: 1.08em;
+    --subtype-button-overlap: 0em;
+
+    &.has-subtype
+    {
+        margin-bottom: calc(0.1em + var(--subtype-buttons-in-margin-size) - var(--subtype-button-overlap));
+    }
+}
+
+.skill-name
+{
+    line-height: 1;
+
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+
+    & input
+    {
+        flex-grow: 1;
+        width: 100%;
+
+        font-family: var(--font-body);
+        font-weight: 500;
+        font-size: 0.85em;
+        color: color-mix(in oklab, currentColor 60%, transparent);
+    }
+}
+
+.subtype-buttons
+{
+    position: absolute;
+    height: 1.875rem;
+    top: 0;
+
+    & button
+    {
+        position: absolute;
+        bottom: calc(-1 * var(--subtype-buttons-in-margin-size) + var(--subtype-button-overlap));
+
+        display: flex;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        padding: 0.08rem 0 0 0;
+
+        width: var(--subtype-buttons-in-margin-size);
+        height: var(--subtype-buttons-in-margin-size);
+
+        font-size: var(--subtype-buttons-in-margin-size);
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+
+        color: color-mix(in oklab, var(--text-primary) 60%, transparent);
+        background-color: color-mix(in oklab, var(--background-primary) 66%, transparent);
+        border: 1px solid color-mix(in oklab, currentColor 80%, transparent);
+        border-radius: 6px;
+
+        &:last-of-type
+        {
+            left: calc(0.2em + var(--subtype-buttons-in-margin-size));
+        }
+
+        &:focus, &:hover
+        {
+            &:not(:disabled)
+            {
+                color: color-mix(in oklab, var(--text-primary) 80%, transparent);
+                background-color: color-mix(in oklab, var(--background-primary) 85%, transparent);
+            }
+        }
+        &:active
+        {
+            /* Somewhat redundant, but keeps specificity in line with above */
+            &:not(:disabled)
+            {
+                color: var(--text-secondary);
+                background-color: var(--background-primary);
+            }
+            &:disabled
+            {
+                color: color-mix(in oklab, var(--text-secondary) 75%, black);
+            }
+        }
+
+        &:disabled
+        {
+            color: var(--text-secondary);
+        }
+    }
+}
+
+/* #endregion */
 
 /* #endregion */
