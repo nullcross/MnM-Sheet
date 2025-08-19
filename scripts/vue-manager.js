@@ -40,6 +40,13 @@ function parseNumberInternational(stringToParse, parser)
 
 function formatNumber(num) { return typeof num === "number" ? Intl.NumberFormat().format(num) : num; }
 
+function appendAttribute(target, attrName, value, prepend = false) 
+{
+    if (prepend) target.setAttribute(attrName, value + target.getAttribute(attrName));
+
+    else target.setAttribute(attrName, target.getAttribute(attrName) + value);
+}
+
 // #endregion
 
 // #region Data Classes
@@ -56,12 +63,12 @@ class Score
 
 class Skill
 {
-    constructor(displayName, ability, rank = 0, mods = 0, trainedOnly = false, subtype = null, multiples = [])
+    constructor(displayName, ability, rank = 0, mods = 0, trainedOnly = false, type = null, subtypes = [])
     {
         this.displayName = displayName; this.ability = ability;
         this.rank = rank ?? 0; this.mods = mods ?? 0;
         this.trainedOnly = trainedOnly ?? false;
-        this.subtype = subtype; this.multiples = multiples;
+        this.type = type; this.subtypes = subtypes;
     }
 }
 
@@ -169,6 +176,18 @@ createApp({
             currentDisplayMode.value = targetMode;
         }
 
+        function addSubtype(e, skillKey)
+        {
+            const thisSkill = skills.value[skillKey];
+            thisSkill.subtypes.push(new Skill(
+                thisSkill.displayName, thisSkill.ability, 0, 0, thisSkill.trainedOnly, "", null
+            ));
+        }
+        function removeSubtype(e, skillKey, thisIndex)
+        {
+            skills.value[skillKey].subtypes.splice(thisIndex, 1);
+        }
+
 
         function applyChanges(e, destination) 
         {
@@ -240,6 +259,8 @@ createApp({
             formatNumber,
 
             setTheme,
+            addSubtype,
+            removeSubtype,
             applyChanges,
             applyParsedChanges,
             getScoreTotal,

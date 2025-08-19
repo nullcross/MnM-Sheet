@@ -229,8 +229,8 @@
                             <span>
                                 {{
                                 stats.other.defenseBonus + stats.other.extraDodge + Math.max(-12, Math.min(12,
-                                -1 * Math.floor(Math.pow(2, Math.abs(info.size) - 1))))
-                                }}
+                                Math.sign(info.size * -1) * Math.floor(Math.pow(2, Math.abs(info.size) - 1))
+                                ))}}
                             </span>
                             <div class="score-bonus"><span>SIZE</span></div>
                         </output>
@@ -274,7 +274,7 @@
         <div id="skills-and-feats">
 
             <div id="skills">
-                <div id="skills-headers" class="skills-row">
+                <div id="skills-headers" class="skills-row-inner">
                     <h2>Skills</h2>
                     <h3>Ability</h3>
                     <h3>Total</h3>
@@ -282,28 +282,54 @@
                     <h3>Extras</h3>
                 </div>
 
-                <div class="skills-row" v-for="(skVal, skNme) of skills"
-                     :class="{ 'trained-only':skVal.trainedOnly, 'untrained':skVal.rank < 1, 'has-subtype':skVal.subtype !== null }">
+                <div class="skills-row-outer" v-for="(skVal, skNme) of skills"
+                     :class="{ 'trained-only':skVal.trainedOnly, 'untrained':skVal.rank < 1, 'has-subtype':skVal.type !== null }">
 
-                    <h4 class="skill-name" :aria-label="skVal.trainedOnly ? 'Trained Only' : null">
-                        <span>{{ skVal.displayName }}</span>
-                        <input type="text" name="subtype" :id="skNme + '-subtype'" v-if="skVal.subtype !== null"
-                               :value="skVal.subtype" @change="applyChanges($event, skVal)">
-                    </h4>
+                    <!-- Base Skill -->
+                    <div class="skills-row-inner">
+                        <h4 class="skill-name" :aria-label="skVal.trainedOnly ? 'Trained Only' : null">
+                            <span>{{ skVal.displayName }}</span>
 
-                    <span class="skill-ability">{{ skVal.ability }}</span>
-                    <output class="skill-total" :for="skNme + '-rank ' + skNme + '-mods'">
-                        {{ skVal.rank + skVal.mods + getScoreBonus(skVal.ability) }}
-                    </output>
-                    <input type="text" name="rank" :id="skNme + '-rank'" class="skill-rank" size="2" :value="skVal.rank"
-                           @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
-                    <input type="text" name="mods" :id="skNme + '-mods'" class="skill-mods" size="2" :value="skVal.mods"
-                           @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
+                            <input type="text" name="type" :id="skNme + '-type'" placeholder="(Type)"
+                                   v-if="skVal.type !== null" :value="skVal.type" @change="applyChanges($event, skVal)">
+                        </h4>
 
-                    <div class="subtype-buttons" v-if="skVal.subtype !== null">
-                        <button type="button" :id="'add-' + skNme" :aria-level="'Subtract ' + skVal.displayName + ' Subtype'">-</button>
-                        <button type="button" :id="'add-' + skNme" :aria-level="'Add ' + skVal.displayName + ' Subtype'">+</button>
+                        <span class="skill-ability">{{ skVal.ability }}</span>
+                        <output class="skill-total" :for="skNme + '-rank ' + skNme + '-mods'">
+                            {{ skVal.rank + skVal.mods + getScoreBonus(skVal.ability) }}
+                        </output>
+                        <input type="text" name="rank" :id="skNme + '-rank'" class="skill-rank" size="2" :value="skVal.rank"
+                               @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
+                        <input type="text" name="mods" :id="skNme + '-mods'" class="skill-mods" size="2" :value="skVal.mods"
+                               @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
+
+                        <button type="button" :id="'add-' + skNme" class="subtype-button" :aria-label="'Add one ' + skVal.displayName + ' subtype'"
+                                v-if="skVal.type !== null" :disabled="skVal.rank + skVal.mods < 1" @click="addSubtype($event, skNme)">+</button>
                     </div>
+
+                    <!-- Subtypes -->
+                    <div class="skills-row-inner subtype" v-for="(sbVal, index) of skVal.subtypes">
+                        <h4 class="skill-name" :aria-label="sbVal.trainedOnly ? 'Trained Only' : null">
+                            <!-- v  Hidden by CSS  v -->
+                            <span>{{ skVal.displayName }}</span>
+
+                            <input type="text" name="type" :id="skNme + '-type_' + index" placeholder="(Type)"
+                                   v-if="sbVal.type !== null" :value="sbVal.type" @change="applyChanges($event, sbVal)">
+                        </h4>
+
+                        <span class="skill-ability">{{ sbVal.ability }}</span>
+                        <output class="skill-total" :for="skNme + '-rank_' + index + ' ' + skNme + '-mods_' + index">
+                            {{ sbVal.rank + sbVal.mods + getScoreBonus(sbVal.ability) }}
+                        </output>
+                        <input type="text" name="rank" :id="skNme + '-rank_' + index" class="skill-rank" size="2" :value="sbVal.rank"
+                               @change="applyParsedChanges($event, sbVal, NumberTypes.INT, false)">
+                        <input type="text" name="mods" :id="skNme + '-mods_' + index" class="skill-mods" size="2" :value="sbVal.mods"
+                               @change="applyParsedChanges($event, sbVal, NumberTypes.INT, false)">
+
+                        <button type="button" :id="'remove-' + skNme + '_' + index" class="subtype-button"
+                                :aria-label="'Remove this ' + skVal.displayName + ' subtype'" @click="removeSubtype($event, skNme, index)">-</button>
+                    </div>
+
                 </div>
             </div>
 
