@@ -276,10 +276,10 @@
             <div id="skills">
                 <div id="skills-headers" class="skills-row-inner">
                     <h2>Skills</h2>
-                    <h3>Ability</h3>
-                    <h3>Total</h3>
-                    <h3>Rank</h3>
-                    <h3>Extras</h3>
+                    <span id="skill-head_ability">Ability</span>
+                    <span id="skill-head_total">Total</span>
+                    <span id="skill-head_rank">Rank</span>
+                    <span id="skill-head_extras">Extras</span>
                 </div>
 
                 <div class="skills-row-outer" v-for="(skVal, skNme) of skills"
@@ -287,21 +287,21 @@
 
                     <!-- Base Skill -->
                     <div class="skills-row-inner">
-                        <h4 class="skill-name" :aria-label="skVal.trainedOnly ? 'Trained Only' : null">
+                        <h3 class="skill-name" :aria-label="skVal.trainedOnly ? 'Trained Only' : null">
                             <span>{{ skVal.displayName }}</span>
 
                             <input type="text" name="type" :id="skNme + '-type'" placeholder="(Type)"
                                    v-if="skVal.type !== null" :value="skVal.type" @change="applyChanges($event, skVal)">
-                        </h4>
+                        </h3>
 
-                        <span class="skill-ability">{{ skVal.ability }}</span>
-                        <output class="skill-total" :for="skNme + '-rank ' + skNme + '-mods'">
+                        <span class="skill-ability" aria-labelledby="skill-head_ability">{{ skVal.ability }}</span>
+                        <output class="skill-total" aria-labelledby="skill-head_total" :for="skNme + '-rank ' + skNme + '-mods'">
                             {{ skVal.rank + skVal.mods + getScoreBonus(skVal.ability) }}
                         </output>
-                        <input type="text" name="rank" :id="skNme + '-rank'" class="skill-rank" size="2" :value="skVal.rank"
-                               @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
-                        <input type="text" name="mods" :id="skNme + '-mods'" class="skill-mods" size="2" :value="skVal.mods"
-                               @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
+                        <input type="text" name="rank" :id="skNme + '-rank'" class="skill-rank" size="2" aria-labelledby="skill-head_rank"
+                               :value="skVal.rank" @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
+                        <input type="text" name="mods" :id="skNme + '-mods'" class="skill-mods" size="2" aria-labelledby="skill-head_extras"
+                               :value="skVal.mods" @change="applyParsedChanges($event, skVal, NumberTypes.INT, false)">
 
                         <button type="button" :id="'add-' + skNme" class="subtype-button" :aria-label="'Add one ' + skVal.displayName + ' subtype'"
                                 v-if="skVal.type !== null" :disabled="skVal.rank + skVal.mods < 1" @click="addSubtype($event, skNme)">+</button>
@@ -309,22 +309,22 @@
 
                     <!-- Subtypes -->
                     <div class="skills-row-inner subtype" v-for="(sbVal, index) of skVal.subtypes">
-                        <h4 class="skill-name" :aria-label="sbVal.trainedOnly ? 'Trained Only' : null">
+                        <h3 class="skill-name" :aria-label="sbVal.trainedOnly ? 'Trained Only' : null">
                             <!-- v  Hidden by CSS  v -->
                             <span>{{ skVal.displayName }}</span>
 
                             <input type="text" name="type" :id="skNme + '-type_' + index" placeholder="(Type)"
                                    v-if="sbVal.type !== null" :value="sbVal.type" @change="applyChanges($event, sbVal)">
-                        </h4>
+                        </h3>
 
-                        <span class="skill-ability">{{ sbVal.ability }}</span>
-                        <output class="skill-total" :for="skNme + '-rank_' + index + ' ' + skNme + '-mods_' + index">
+                        <span class="skill-ability" aria-labelledby="skill-head_ability">{{ sbVal.ability }}</span>
+                        <output class="skill-total" aria-labelledby="skill-head_total" :for="skNme + '-rank_' + index + ' ' + skNme + '-mods_' + index">
                             {{ sbVal.rank + sbVal.mods + getScoreBonus(sbVal.ability) }}
                         </output>
-                        <input type="text" name="rank" :id="skNme + '-rank_' + index" class="skill-rank" size="2" :value="sbVal.rank"
-                               @change="applyParsedChanges($event, sbVal, NumberTypes.INT, false)">
-                        <input type="text" name="mods" :id="skNme + '-mods_' + index" class="skill-mods" size="2" :value="sbVal.mods"
-                               @change="applyParsedChanges($event, sbVal, NumberTypes.INT, false)">
+                        <input type="text" name="rank" :id="skNme + '-rank_' + index" class="skill-rank" size="2" aria-labelledby="skill-head_rank"
+                               :value="sbVal.rank" @change="applyParsedChanges($event, sbVal, NumberTypes.INT, false)">
+                        <input type="text" name="mods" :id="skNme + '-mods_' + index" class="skill-mods" size="2" aria-labelledby="skill-head_extras"
+                               :value="sbVal.mods" @change="applyParsedChanges($event, sbVal, NumberTypes.INT, false)">
 
                         <button type="button" :id="'remove-' + skNme + '_' + index" class="subtype-button"
                                 :aria-label="'Remove this ' + skVal.displayName + ' subtype'" @click="removeSubtype($event, skNme, index)">-</button>
