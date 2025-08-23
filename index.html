@@ -17,7 +17,7 @@
 <body id="app">
 
     <div id="meta-ui">
-        <button id="toggle-theme" type="button" value="0" @click="setTheme"
+        <button id="toggle-theme" type="button" value="0" ref="themeButton" @click="setTheme"
                 title="Theme: System Default - Click to switch"
                 aria-label="Theme: System Default - Click to switch">
             <img src="" alt="">
@@ -118,7 +118,6 @@
 
         <!-- #region Misc Scores -->
         <div id="ability-scores" class="row-section">
-
             <h2 id="ability-scores-head">Abilities & Saves</h2>
 
             <div id="scores-row-1">

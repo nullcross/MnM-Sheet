@@ -1,12 +1,7 @@
 // import { createApp, ref, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js'
-import { createApp, ref, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+import { createApp, ref, onMounted, useTemplateRef } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 
 // #region Helpers and Consts
-
-const themes = [
-    { "index": 0, "className": "light", "displayName": "Light", "iconSrc": "media/alessio-atzeni-sun-icon.svg" },
-    { "index": 1, "className": "dark", "displayName": "Dark", "iconSrc": "media/fa-moon-solid.svg" },
-];
 
 // Enum structure taken from https://stackoverflow.com/a/44447975
 const NumberTypes = Object.freeze({
@@ -20,6 +15,8 @@ const NumberTypes = Object.freeze({
 const localeTestNumber = Intl.NumberFormat().format(1000.01);
 const thousandsSeparator = localeTestNumber.charAt(1);
 const decimalSeparator = localeTestNumber.charAt(5);
+
+function formatNumber(num) { return typeof num === "number" ? Intl.NumberFormat().format(num) : num; }
 
 /**
  * Uses regex to turn a number formatted in the browser's locale into one javascript parsing functions can understand, 
@@ -38,7 +35,7 @@ function parseNumberInternational(stringToParse, parser)
     return parser(stringToParse);
 }
 
-function formatNumber(num) { return typeof num === "number" ? Intl.NumberFormat().format(num) : num; }
+
 
 function appendAttribute(target, attrName, value, prepend = false) 
 {
@@ -50,6 +47,14 @@ function appendAttribute(target, attrName, value, prepend = false)
 // #endregion
 
 // #region Data Classes
+
+class Theme
+{
+    constructor(className, displayName, iconSrc)
+    {
+        this.className = className; this.displayName = displayName; this.iconSrc = iconSrc;
+    }
+}
 
 class Score 
 {
@@ -77,7 +82,13 @@ class Skill
 createApp({
     setup()
     {
-        const currentDisplayMode = ref(window.matchMedia("(prefers-color-scheme: dark)").matches ? themes[1] : themes[0]);
+        const themes = ref([
+            new Theme("light", "Light", "media/alessio-atzeni-sun-icon.svg"),
+            new Theme("dark", "Dark", "media/fa-moon-solid.svg"),
+        ]);
+        const currentThemeIndex = ref(window.matchMedia("(prefers-color-scheme: dark)").matches ? 1 : 0);
+        const themeButton = useTemplateRef("themeButton");
+
 
         const info = ref({
             "name": "",
@@ -152,29 +163,59 @@ createApp({
 
         function setTheme(e, t = "")
         {
-            let targetMode;
+            let targetMode, targetIndex;
+
             // If t is a display mode object, just use it
-            if (t.iconSrc) targetMode = t;
+            if (t instanceof Theme) targetMode = t;
+
             // if not, try and find a matching mode (don't waste time on empty/whitespace)
-            else if (typeof t === "string" && !/^\s*$/.test(t))
-                targetMode = themes.find(el => el.className === t);
+            else if (typeof t === "string" && t !== "" && !/^\s*$/.test(t))
+            {
+                targetIndex = themes.value.findIndex(el => el.className === t);
+                targetMode = themes.value[targetIndex];
+            }
 
-
-            // If we've got an e with a valid currentTarget, use that, otherwise go fetch the button
-            let modeButton = (e ? e.currentTarget : null) ?? document.querySelector("#toggle-theme");
-            // If no target mode, take the mode directly after the current one (wrapping around with %)
-            targetMode ??= themes[(currentDisplayMode.value.index + 1) % themes.length];
+            // If still no target mode, take the mode directly after the current one (wrapping around with %)
+            else
+            {
+                targetIndex = (currentThemeIndex.value + 1) % themes.value.length;
+                targetMode = themes.value[targetIndex];
+            }
 
 
             document.documentElement.setAttribute("class", targetMode.className);
 
-            modeButton.setAttribute("title", `Theme: ${targetMode.displayName} - Click to switch`);
-            modeButton.setAttribute("aria-label", `Theme: ${targetMode.displayName} - Click to switch`);
-            modeButton.querySelector("img").setAttribute("src", targetMode.iconSrc);
+            themeButton.value.setAttribute("title", `Theme: ${targetMode.displayName} - Click to switch`);
+            themeButton.value.setAttribute("aria-label", `Theme: ${targetMode.displayName} - Click to switch`);
+            themeButton.value.querySelector("img").setAttribute("src", targetMode.iconSrc);
 
-            modeButton.value = targetMode.index;
-            currentDisplayMode.value = targetMode;
+            currentThemeIndex.value = targetIndex ?? themes.value.indexOf(targetMode);
+            themeButton.value.value = currentThemeIndex.value;
         }
+
+
+
+        function getScoreCalc(scoreAbbrv, calcType)
+        {
+            if (!scoreAbbrv || scoreAbbrv.trim() === "-") return 0;
+
+            switch (calcType)
+            {
+                case "total":
+                    const targetScore = stats.value.main[scoreAbbrv] ?? stats.value.saves[scoreAbbrv] ?? stats.value.other[scoreAbbrv];
+                    return targetScore?.base + targetScore?.extr;
+
+                case "bonus":
+                    return Math.floor((getScoreCalc(scoreAbbrv, "total") - 10) / 2);
+
+                default:
+                    break;
+        }
+        }
+        function getScoreTotal(scoreAbbrv) { return getScoreCalc(scoreAbbrv, "total"); }
+        function getScoreBonus(scoreAbbrv) { return getScoreCalc(scoreAbbrv, "bonus"); }
+
+
 
         function addSubtype(e, skillKey)
         {
@@ -229,36 +270,24 @@ createApp({
         }
 
 
-        function getScoreTotal(scoreAbbrv)
-        {
-            if (!scoreAbbrv || scoreAbbrv.trim() === "-") return 0;
-
-            const targetScore = stats.value.main[scoreAbbrv] ?? stats.value.saves[scoreAbbrv] ?? stats.value.other[scoreAbbrv];
-            return targetScore?.base + targetScore?.extr;
-        }
-
-        function getScoreBonus(scoreAbbrv)
-        {
-            if (!scoreAbbrv || scoreAbbrv.trim() === "-") return 0;
-
-            return Math.floor((getScoreTotal(scoreAbbrv) - 10) / 2);
-        }
-
-
 
         onMounted(() =>
         {
-            setTheme(null, currentDisplayMode.value);
+            setTheme(null, themes.value[currentThemeIndex.value]);
         })
 
         return {
             NumberTypes,
+
             info,
             stats,
             skills,
             formatNumber,
 
             setTheme,
+            getScoreCalc,
+            getScoreTotal,
+            getScoreBonus,
             addSubtype,
             removeSubtype,
             applyChanges,
