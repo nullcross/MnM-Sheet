@@ -1360,8 +1360,6 @@ input[type="text"],
     overflow-wrap: break-word;
     border: 1px solid var(--border-primary);
     border-radius: 4px 4px 0 0;
-
-    z-index: 0;
 }
 .feat-body
 {
@@ -1369,6 +1367,13 @@ input[type="text"],
 
     &:focus
     {
+        /*
+            No-op filter to suppress a warning that the z-index won't work due to no stacking context.
+            
+            It does, in fact, work for what it's supposed to (making the focus outline not be weirdly
+            overlapped) WITHOUT this line, but it can't hurt to include anyway.
+        */
+        filter: blur(0);
         z-index: 1;
     }
 }
@@ -1402,7 +1407,12 @@ input[type="text"],
         border-right-width: 0;
     }
 
-    &:focus, &:hover
+    &:focus
+    {
+        filter: brightness(120%) contrast(95%);
+        z-index: 1;
+    }
+    &:hover
     {
         filter: brightness(120%) contrast(95%);
     }
@@ -1410,11 +1420,6 @@ input[type="text"],
     {
         background-color: var(--background-primary);
         filter: contrast(105%);
-    }
-
-    &:focus
-    {
-        z-index: 1;
     }
 
     &:disabled
