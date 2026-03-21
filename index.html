@@ -195,10 +195,11 @@
                         <label for="injuries">Injuries</label>
                     </div>
                     <div class="labeled-check" v-for="(cnVal, cnName) of stats.conditions">
-                        <div class="cond-backdrop" aria-hidden="true" @click="stats.conditions[cnName] = !cnVal"></div>
+                        <!-- Extra clickable area that sets focus via label's implicit behavior, aria-hidden to eliminate redundancy -->
+                        <label :for="cnName" class="cond-backdrop" aria-hidden="true"></label>
                         <input type="checkbox" :name="cnName" :id="cnName" v-model="stats.conditions[cnName]"
                                @keyup.enter="stats.conditions[cnName] = !cnVal" :aria-checked="cnVal">
-                        <label :for="cnName">{{ cnName }}</label>
+                        <label :for="cnName" class="cond-label">{{ cnName.charAt(0).toUpperCase() + cnName.substring(1) }}</label>
                     </div>
                 </div>
 

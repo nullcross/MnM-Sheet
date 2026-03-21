@@ -962,7 +962,7 @@ input[type="text"],
         margin: 0 4ch;
     }
 
-    & label
+    & .cond-label
     {
         margin: 0;
         position: absolute;
@@ -972,11 +972,11 @@ input[type="text"],
         line-height: 1;
         color: var(--text-secondary);
     }
-    &:nth-child(odd) label
+    &:nth-child(odd) .cond-label
     {
         top: calc(-1em * var(--cond-label-in-margin-size));
     }
-    &:nth-child(even) label
+    &:nth-child(even) .cond-label
     {
         bottom: calc(-1em * var(--cond-label-in-margin-size));
     }
