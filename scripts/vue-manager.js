@@ -1,5 +1,6 @@
 // import { createApp, ref, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js'
 import { createApp, ref, onMounted, useTemplateRef } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+import { renderToHTML } from './markdown-hub.js'
 
 // #region Helpers and Consts
 
@@ -44,6 +45,21 @@ function appendAttribute(target, attrName, value, prepend = false)
     else target.setAttribute(attrName, target.getAttribute(attrName) + value);
 }
 
+function tryCaratFromPoint(xPos, yPos, options = {})
+{
+    if (document.caretPositionFromPoint)
+        return document.caretPositionFromPoint(xPos, yPos, options);
+
+    else if (document.caretRangeFromPoint)
+    {
+        const result = document.caretRangeFromPoint(xPos, yPos);
+        return { offsetNode: result.startContainer, offset: result.startOffset };
+    }
+
+    console.warn("Attempted to get carat position/range, but no method for doing so is supported in this browser.");
+    return null;
+}
+
 // #endregion
 
 // #region Data Classes
@@ -77,6 +93,15 @@ class Skill
     }
 }
 
+class Feat
+{
+    constructor(name = "", rank = "1", description = "", dirty = false)
+    {
+        this.name = name; this.rank = rank;
+        this.description = description; this.dirty = dirty ?? false;
+    }
+}
+
 // #endregion
 
 createApp({
@@ -88,6 +113,8 @@ createApp({
         ]);
         const currentThemeIndex = ref(window.matchMedia("(prefers-color-scheme: dark)").matches ? 1 : 0);
         const themeButton = useTemplateRef("themeButton");
+
+        const featDescriptions = useTemplateRef("featDesc");
 
 
         const info = ref({
@@ -159,6 +186,8 @@ createApp({
             "swim": new Skill("Swim", "str"),
         });
 
+        const feats = ref([new Feat()]);
+
 
 
         function setTheme(e, t = "")
@@ -210,7 +239,7 @@ createApp({
 
                 default:
                     break;
-        }
+            }
         }
         function getScoreTotal(scoreAbbrv) { return getScoreCalc(scoreAbbrv, "total"); }
         function getScoreBonus(scoreAbbrv) { return getScoreCalc(scoreAbbrv, "bonus"); }
@@ -230,11 +259,22 @@ createApp({
         }
 
 
-        function applyChanges(e, destination) 
+
+        function passDisplayClick(e, inputDesc)
         {
-            destination[e.target.name] = e.target.value;
+            const clickLocation = tryCaratFromPoint(e.clientX, e.clientY);
+
+            let correspondingNode = [];
+
+            inputDesc.focus();
         }
 
+
+
+        function applyChanges(e, destination, key = null, change = null) 
+        {
+            destination[key ?? e.target.name] = change ?? e.target.value;
+        }
 
         function applyParsedChanges(e, destination, parseType, allowUnparseable = true)
         {
@@ -271,29 +311,57 @@ createApp({
 
 
 
+        function updateDesc(e, featIndex, displayDesc)
+        {
+            displayDesc.innerHTML = renderToHTML(e.target.innerHTML.replace(/<br>/gm, "\n"));
+
+            feats.value[featIndex].dirty = e.target.innerHTML !== feats.value[featIndex].description;
+        }
+
+        function commitDesc(shouldSave, featIndex, inputDesc, displayDesc)
+        {
+            if (shouldSave)
+                feats.value[featIndex].description = inputDesc.innerHTML;
+            else
+            {
+                inputDesc.innerHTML = feats.value[featIndex].description;
+                displayDesc.innerHTML = inputDesc.innerHTML;
+            }
+
+            feats.value[featIndex].dirty = false;
+        }
+
+
+
         onMounted(() =>
         {
             setTheme(null, themes.value[currentThemeIndex.value]);
+
+            // TODO: go through feats and update all descriptions to match their data value
         })
 
         return {
-            NumberTypes,
-
             info,
             stats,
             skills,
-            formatNumber,
+            feats,
 
+            NumberTypes,
+            formatNumber,
             setTheme,
+
             getScoreCalc,
             getScoreTotal,
             getScoreBonus,
+
             addSubtype,
             removeSubtype,
+            passDisplayClick,
+
             applyChanges,
             applyParsedChanges,
-            getScoreTotal,
-            getScoreBonus,
+            updateDesc,
+            commitDesc,
         }
     }
 }).mount('#app')

@@ -116,7 +116,7 @@
         </div>
         <!-- #endregion -->
 
-        <!-- #region Misc Scores -->
+        <!-- #region Scores -->
         <div id="ability-scores" class="row-section">
             <h2 id="ability-scores-head">Abilities & Saves</h2>
 
@@ -334,19 +334,46 @@
 
             <div id="feats">
                 <h2>Feats</h2>
-                <span>stuff will go here! promise!</span>
+
+                <div class="feat-container" v-for="(ft, index) of feats">
+                    <h3 class="feat-name-container">
+                        <input type="text" name="name" :id="'feat-' + index + '-name'" placeholder="(Feat Name)"
+                               :value="ft.name" @change="applyChanges($event, ft)">
+                    </h3>
+                    <div class="feat-rank-container">
+                        <label :for="'feat-' + index + '-rank'">Rank:</label>
+                        <input type="text" name="rank" :id="'feat-' + index + '-rank'" class="feat-rank" size="2"
+                               :value="ft.rank" @change="applyParsedChanges($event, ft, NumberTypes.INT, false)">
+                    </div>
+
+                    <div :id="'feat-' + index + '-body_input'" class="feat-body" ref="featDesc"
+                         role="textbox" contenteditable="plaintext-only"
+                         aria-multiline="true" aria-placeholder="Describe this feat here..."
+                         @input="updateDesc($event, index, $refs.featDisplay[index])">
+                    </div>
+                    <output :id="'feat-' + index + '-body_display'" class="feat-body-display" ref="featDisplay"
+                            :for="'feat-' + index + '-body_input'" aria-hidden="true" @click="passDisplayClick($event, $refs.featDesc[index])">
+                    </output>
+
+                    <div class="feat-buttons_data">
+                        <button type="button" :disabled="!ft.dirty" @click="commitDesc(true, index, $refs.featDesc[index], $refs.featDisplay[index])">Save</button>
+                        <button type="button" :disabled="!ft.dirty" @click="commitDesc(false, index, $refs.featDesc[index], $refs.featDisplay[index])">Discard</button>
+                    </div>
+                    <div class="feat-buttons_count">
+                        <button type="button">-</button>
+                        <button type="button">+</button>
+                    </div>
+                </div>
+
             </div>
 
         </div>
 
         <p><br><br><br><br>TEMP/TESTING</p>
         <hr>
-        <p><br></p>
         <div>
             <p>
-                <span>({{ info }})</span> <br><br>
-                <span>({{ stats }})</span> <br><br>
-                <span>({{ skills }})</span> <br><br>
+                <span>({{ feats }})</span> <br><br>
                 Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quod aliquam provident, libero commodi rem voluptates odit reiciendis culpa quae vero molestias
                 ullam odio quis exercitationem consectetur inventore. Iusto, deserunt blanditiis. Lorem, ipsum dolor sit amet consectetur adipisicing elit. Mollitia, numquam minima
                 ad sint error alias nesciunt id quasi repudiandae quibusdam adipisci beatae nam omnis atque officiis, quos, debitis illum necessitatibus.

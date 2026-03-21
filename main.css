@@ -105,9 +105,11 @@ h1, h2, h3, h4, h5, h6
 html, html.light
 {
     --background-primary: #eee;
-    --border-light: #a9aaad;
-    --border-faint: color-mix(in oklab, var(--border-light) 75%, transparent);
-    --border-ghost: color-mix(in oklab, var(--border-light) 25%, transparent);
+    --background-secondary: #e1e1e1;
+    --border-primary: #a9aaad;
+    --border-mid: color-mix(in oklab, var(--border-primary) 75%, transparent);
+    --border-light: color-mix(in oklab, var(--border-primary) 50%, transparent);
+    --border-faint: color-mix(in oklab, var(--border-primary) 25%, transparent);
 
     --button-hover: #d0d0d7;
     --button-pressed: #b1b1b9;
@@ -121,7 +123,8 @@ html, html.light
 html.dark
 {
     --background-primary: #1b1b1b;
-    --border-light: #565552;
+    --background-secondary: #222;
+    --border-primary: #565552;
 
     --button-hover: #2f2f28;
     --button-pressed: #4e4e46;
@@ -226,7 +229,7 @@ input[type="text"],
     width: 1em;
     height: 1em;
     background-color: #fff;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border-primary);
     border-radius: 3px;
 
     position: relative;
@@ -754,7 +757,7 @@ input[type="text"],
 
     & .score-total
     {
-        border-color: var(--border-faint);
+        border-color: var(--border-mid);
     }
 
     & .score-bonus
@@ -764,7 +767,7 @@ input[type="text"],
         font-size: 0.6em;
 
         color: var(--text-secondary);
-        border-color: var(--border-faint);
+        border-color: var(--border-mid);
     }
 
     & .score-bonus > span
@@ -824,7 +827,7 @@ input[type="text"],
 
     font-size: 1.5em;
     font-family: 'Courier New', Courier, monospace;
-    font-weight: normal;
+    font-weight: 600;
     color: color-mix(in oklab, var(--text-primary) 80%, transparent);
 
     background-color: color-mix(in oklab, var(--background-primary) 66%, transparent);
@@ -984,7 +987,7 @@ input[type="text"],
     position: absolute;
     inset: 0.25em 0;
 
-    background: var(--border-ghost);
+    background: var(--border-faint);
     border-radius: 6px;
 }
 
@@ -1123,7 +1126,7 @@ input[type="text"],
     font-size: 1.17em;
 
     color: var(--text-secondary);
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border-primary);
     border-radius: 100%;
 
     margin: auto;
@@ -1131,7 +1134,7 @@ input[type="text"],
 }
 .skill-total
 {
-    border: 3px double var(--border-light);
+    border: 3px double var(--border-primary);
 }
 
 .trained-only .skill-name span
@@ -1264,8 +1267,192 @@ input[type="text"],
     {
         color: var(--text-secondary);
         border-color: color-mix(in oklab, currentColor 60%, transparent);
-        opacity: 0.6;
+        opacity: 0.3;
     }
+}
+
+/* #endregion */
+
+/* #region Feats */
+
+.feat-container
+{
+    margin-top: 0.5em;
+    padding: 0.5em;
+
+    background-color: var(--background-secondary);
+    border: 2px outset var(--border-mid);
+    border-radius: 6px;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+        "name rank"
+        "body body"
+        "data count";
+    gap: 0 1.5em;
+}
+
+.feat-name-container,
+.feat-rank-container
+{
+    font-family: var(--font-header);
+    font-weight: 600;
+    font-variation-settings: "wdth" 75;
+    font-variant: small-caps;
+
+    --feat-name-rank-margin: 0.2em;
+}
+
+.feat-name-container
+{
+    grid-area: name;
+    margin-left: var(--feat-name-rank-margin);
+
+    & input
+    {
+        width: 100%;
+        font-size: 1.5em;
+
+        &::placeholder
+        {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+    }
+}
+
+.feat-rank-container
+{
+    grid-area: rank;
+    font-size: 1.4em;
+
+    margin-right: var(--feat-name-rank-margin);
+    margin-left: auto;
+    height: 100%;
+
+    display: flex;
+    align-items: end;
+    gap: 0.3em;
+
+    text-transform: uppercase;
+    font-variant: none;
+}
+.feat-rank-container label
+{
+    line-height: 1.2;
+}
+.feat-rank-container input
+{
+    height: 1.2em;
+    margin-top: auto;
+}
+
+.feat-body,
+.feat-body-display
+{
+    grid-area: body;
+
+    margin-top: 0.8em;
+    --feat-body-padding: 0.4em 0.6em;
+    padding: var(--feat-body-padding);
+
+    overflow-wrap: break-word;
+    border: 1px solid var(--border-primary);
+    border-radius: 4px 4px 0 0;
+
+    z-index: 0;
+}
+.feat-body
+{
+    background-color: var(--background-primary);
+
+    &:focus
+    {
+        z-index: 1;
+    }
+}
+.feat-body-display
+{
+    cursor: text;
+    background-color: var(--background-secondary);
+}
+
+:is(.feat-buttons_data, .feat-buttons_count) button
+{
+    border: 1px solid var(--border-primary);
+    border-radius: 0 0 4px 4px;
+    border-width: 0 1px 1px 1px;
+
+    color: var(--text-secondary);
+    background-color: var(--background-secondary);
+
+    transition: filter 0.06s ease-out;
+
+    /*
+        necessary for the below z index to work even though it works just fine on body, which
+        is ALSO unpositioned, contrary to what the docs and error message here imply
+
+        maybe contenteditable creates a stacking context or whatever the fuck??? who knows
+    */
+    position: relative;
+
+    &:first-child
+    {
+        border-right-width: 0;
+    }
+
+    &:focus, &:hover
+    {
+        filter: brightness(120%) contrast(95%);
+    }
+    &:active
+    {
+        background-color: var(--background-primary);
+        filter: contrast(105%);
+    }
+
+    &:focus
+    {
+        z-index: 1;
+    }
+
+    &:disabled
+    {
+        color: var(--border-light);
+        background-color: var(--background-secondary);
+        border-color: var(--border-light);
+
+        &:not(:active)
+        {
+            filter: none;
+        }
+    }
+}
+
+.feat-buttons_data
+{
+    grid-area: data;
+}
+.feat-buttons_data button
+{
+    width: 12ch;
+    height: 100%;
+    font-weight: 600;
+}
+
+.feat-buttons_count
+{
+    grid-area: count;
+    text-align: right;
+
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+.feat-buttons_count button
+{
+    width: 2rem;
 }
 
 /* #endregion */
