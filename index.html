@@ -276,22 +276,28 @@
             <div id="skills">
                 <div id="skills-headers" class="skills-row-inner">
                     <h2>Skills</h2>
-                    <span id="skill-head_ability">Ability</span>
-                    <span id="skill-head_total">Total</span>
-                    <span id="skill-head_rank">Rank</span>
-                    <span id="skill-head_extras">Extras</span>
+                    <span id="skill-head_ability" class="skill-head">Ability</span>
+                    <span id="skill-head_total" class="skill-head">Total</span>
+                    <span id="skill-head_rank" class="skill-head">Rank</span>
+                    <span id="skill-head_extras" class="skill-head">Extras</span>
                 </div>
 
                 <div class="skills-row-outer" v-for="(skVal, skNme) of skills"
                      :class="{ 'trained-only':skVal.trainedOnly, 'untrained':skVal.rank < 1, 'has-subtype':skVal.type !== null }">
 
-                    <!-- Base Skill -->
+                    <!-- #region Base Skill -->
                     <div class="skills-row-inner">
-                        <h3 class="skill-name" :aria-label="skVal.trainedOnly ? 'Trained Only' : null">
-                            <span>{{ skVal.displayName }}</span>
+                        <h3 class="skill-name-and-type">
+                            <span class="skill-name">
+                                {{ skVal.displayName }}
+                                <span class="trained-only-tooltip"
+                                      title="Trained Only; not usuable if Rank is below 1."
+                                      aria-label="This skill is Trained Only; you may not use it if its rank is below 1."
+                                      v-if="skVal.trainedOnly">*</span>
+                            </span>
 
-                            <input type="text" name="type" :id="skNme + '-type'" placeholder="(Type)"
-                                   v-if="skVal.type !== null" :value="skVal.type" @change="applyChanges($event, skVal)">
+                            <input type="text" name="type" :id="skNme + '-type'" class="skill-type" size="100"
+                                   v-if="skVal.type !== null" :value="skVal.type" placeholder="(Type)" @change="applyChanges($event, skVal)">
                         </h3>
 
                         <span class="skill-ability" aria-labelledby="skill-head_ability">{{ skVal.ability }}</span>
@@ -308,10 +314,15 @@
                     </div>
 
                     <!-- Subtypes -->
-                    <div class="skills-row-inner subtype" v-for="(sbVal, index) of skVal.subtypes">
-                        <h3 class="skill-name" :aria-label="sbVal.trainedOnly ? 'Trained Only' : null">
+                    <div class="skills-row-inner subtype" v-for="(sbVal, index) of skVal.subtypes" :class="{ 'untrained':sbVal.rank < 1 }">
+                        <h3 class="skill-name-and-type">
                             <!-- v  Hidden by CSS  v -->
-                            <span>{{ skVal.displayName }}</span>
+                            <span class="skill-name">
+                                {{ skVal.displayName }}
+                                <span class="trained-only-tooltip" aria-hidden="true"
+                                      v-if="skVal.trainedOnly">*</span>
+                            </span>
+                            <!-- ^ --------------- ^ -->
 
                             <input type="text" name="type" :id="skNme + '-type_' + index" placeholder="(Type)"
                                    v-if="sbVal.type !== null" :value="sbVal.type" @change="applyChanges($event, sbVal)">
@@ -329,6 +340,7 @@
                         <button type="button" :id="'remove-' + skNme + '_' + index" class="subtype-button"
                                 :aria-label="'Remove this ' + skVal.displayName + ' subtype'" @click="removeSubtype($event, skNme, index)">-</button>
                     </div>
+                    <!-- #endregion -->
 
                 </div>
             </div>

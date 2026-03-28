@@ -1096,26 +1096,54 @@ input[type="text"],
     }
 }
 
+/*
+    Why is there a `:not(.specificity-hack)` here, you may ask? Well, if it's not here, then
+    the `margin: auto;` in the `.skill-ability` rule a few lines down gets smaller, and makes
+    the skill ability spans not circular. If that margin rule is toggled off, the specificity
+    hack makes no difference. The only difference it makes is to that one margin declaration.
+    
+    WHY ON GOD'S GREEN EARTH does the specificity of these *FONT* rules change the behaviour
+    of an UNRELATED AND ALSO COMPLETELY FUCKING UNTOUCHED *MARGIN* declaration in an entirely
+    different rule? Don't ask me. It might as well just be to piss me off.
+*/
+:is(.skill-head, .skill-ability, .skill-total, .skill-rank, .skill-mods):not(.specificity-hack)
+{
+    text-align: center;
+
+    font-family: var(--font-header);
+    font-weight: 600;
+    font-variation-settings: "wdth" 75;
+    text-transform: uppercase;
+}
+
+
 .skills-row-inner
 {
     display: grid;
     grid-template-rows: 100%;
-    grid-template-columns: auto repeat(4, 6ch);
-    gap: 0.5em;
+    --skill-row-gap: 0.5;
+    grid-template-columns: auto 6ch calc(6ch + 1.5em * var(--skill-row-gap)) calc(6ch + 1em * var(--skill-row-gap)) calc(6ch + 0.5em * var(--skill-row-gap));
     align-items: center;
-
-    & > *:nth-child(n+2):not(button)
-    {
-        text-align: center;
-
-        font-family: var(--font-header);
-        font-weight: 600;
-        font-variation-settings: "wdth" 75;
-        text-transform: uppercase;
-    }
 }
+/* #region Fake column gap with padding (so it can be different per column) */
+.skill-total, #skill-head_total
+{
+    margin-left: calc(1em * var(--skill-row-gap));
+}
+.skill-total, #skill-head_total,
+.skill-rank, #skill-head_rank
+{
+    margin-right: calc(1em * var(--skill-row-gap) / 2);
+}
+.skill-rank, #skill-head_rank,
+.skill-mods, #skill-head_extras
+{
+    margin-left: calc(1em * var(--skill-row-gap) / 2);
+}
+/* #endregion */
 
-.skill-name
+
+.skill-name-and-type
 {
     line-height: 1;
     font-size: 1.3em;
@@ -1137,39 +1165,21 @@ input[type="text"],
     border: 3px double var(--border-primary);
 }
 
-.trained-only .skill-name span
-{
-    position: relative;
-
-    &::after
-    {
-        content: "*";
-        display: inline-block;
-        position: absolute;
-        right: -1ch;
-        top: -0.1em;
-    }
-}
-
-.skill-name, .skill-total,
+.skill-name-and-type, .skill-total,
 .skill-rank, .skill-mods
 {
     transition: opacity 0.5s cubic-bezier(.33, 1.5, .67, .9);
 }
-.trained-only.untrained
+.trained-only.untrained,
+.trained-only .subtype.untrained
 {
-    & .skill-name,
-    & .subtype-buttons
+    & .skill-name-and-type
     {
         opacity: 0.4;
     }
     & .skill-total
     {
         opacity: 0.3;
-    }
-    & .subtype-buttons
-    {
-        opacity: 0.6;
     }
 }
 .untrained
@@ -1181,28 +1191,44 @@ input[type="text"],
     }
 }
 
+.skill-name
+{
+    position: relative;
+    margin-right: 0.5em;
+}
+.trained-only-tooltip
+{
+    cursor: help;
+
+    position: absolute;
+    padding: 0.1em 0.2em;
+    top: -0.1em;
+    /* Position into normal spot -> account for padding -> adjust a little closer to text  */
+    right: calc(-0.5em - 0.2em + 0.03em);
+}
+
 /* #endregion */
 
 /* #region Types/Subtypes */
 
-.skill-name
+.skill-name-and-type
 {
-    display: flex;
-    flex-direction: row;
-    gap: 0.75em;
+    display: grid;
+    grid-template-columns: max-content auto;
+    gap: 0.25em;
 
     & input
     {
-        flex-grow: 1;
         width: 100%;
+        padding: 0;
 
         font-family: var(--font-body);
-        font-weight: 500;
-        font-size: 0.85em;
+        font-weight: 440;
+        font-size: 0.8em;
         color: color-mix(in oklab, currentColor 60%, transparent);
     }
 }
-.subtype .skill-name :not(input)
+.subtype :is(.skill-name, .skill-ability)
 {
     visibility: hidden;
 }
