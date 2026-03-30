@@ -1343,7 +1343,7 @@ input[type="text"],
     & input
     {
         width: 100%;
-        font-size: 1.5em;
+        font-size: 1.66em;
 
         &::placeholder
         {
@@ -1412,6 +1412,42 @@ input[type="text"],
 {
     cursor: text;
     background-color: var(--background-secondary);
+
+    & :is(h1, h2, h3, h4, h5, h6)
+    {
+        text-transform: none;
+        font-variant: small-caps;
+        color: color-mix(in oklab, var(--text-primary) 60%, var(--text-secondary));
+
+        margin-top: 0.3rem;
+        margin-bottom: 0.05em;
+    }
+    & h1
+    {
+        font-size: 1.66em;
+    }
+    & h2
+    {
+        font-size: 1.4em;
+    }
+    & h3
+    {
+        font-size: 1.33em;
+        color: color-mix(in oklab, var(--text-primary) 20%, var(--text-secondary));
+    }
+    & h4
+    {
+        font-size: 1.25em;
+    }
+    & h5
+    {
+        font-size: 1.2em;
+        color: color-mix(in oklab, var(--text-primary) 20%, var(--text-secondary));
+    }
+    & h6
+    {
+        font-size: 1.1em;
+    }
 }
 
 :is(.feat-buttons_data, .feat-buttons_count) button

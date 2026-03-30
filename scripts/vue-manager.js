@@ -112,9 +112,10 @@ createApp({
             new Theme("dark", "Dark", "media/fa-moon-solid.svg"),
         ]);
         const currentThemeIndex = ref(window.matchMedia("(prefers-color-scheme: dark)").matches ? 1 : 0);
-        const themeButton = useTemplateRef("themeButton");
 
-        const featDescriptions = useTemplateRef("featDesc");
+        const themeButtonElemRef = useTemplateRef("themeButton");
+        const featDescElemRefs = useTemplateRef("featDesc");
+        const featDispElemRefs = useTemplateRef("featDisplay");
 
 
         const info = ref({
@@ -214,12 +215,12 @@ createApp({
 
             document.documentElement.setAttribute("class", targetMode.className);
 
-            themeButton.value.setAttribute("title", `Theme: ${targetMode.displayName} - Click to switch`);
-            themeButton.value.setAttribute("aria-label", `Theme: ${targetMode.displayName} - Click to switch`);
-            themeButton.value.querySelector("img").setAttribute("src", targetMode.iconSrc);
+            themeButtonElemRef.value.setAttribute("title", `Theme: ${targetMode.displayName} - Click to switch`);
+            themeButtonElemRef.value.setAttribute("aria-label", `Theme: ${targetMode.displayName} - Click to switch`);
+            themeButtonElemRef.value.querySelector("img").setAttribute("src", targetMode.iconSrc);
 
             currentThemeIndex.value = targetIndex ?? themes.value.indexOf(targetMode);
-            themeButton.value.value = currentThemeIndex.value;
+            themeButtonElemRef.value.value = currentThemeIndex.value;
         }
 
 
@@ -325,7 +326,7 @@ createApp({
             else
             {
                 inputDesc.innerHTML = feats.value[featIndex].description;
-                displayDesc.innerHTML = inputDesc.innerHTML;
+                displayDesc.innerHTML = renderToHTML(inputDesc.innerHTML.replace(/<br>/gm, "\n"));
             }
 
             feats.value[featIndex].dirty = false;
@@ -337,7 +338,14 @@ createApp({
         {
             setTheme(null, themes.value[currentThemeIndex.value]);
 
-            // TODO: go through feats and update all descriptions to match their data value
+            // Feat descriptions aren't auto-populated due to them needing different binding behaviour, so do it manually
+            //     This shouldn't actually matter given that feats should default to having empty descriptions, but this is
+            //     technically the more proper way to do it if that weren't the case.
+            for (let i = 0; i < feats.value.length; i++)
+            {
+                featDescElemRefs.value[i].innerHTML = feats.value[i].description;
+                featDispElemRefs.value[i].innerHTML = renderToHTML(featDescElemRefs.value[i].innerHTML.replace(/<br>/gm, "\n"));
+            }
         })
 
         return {
