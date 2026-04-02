@@ -1421,6 +1421,11 @@ input[type="text"],
 
         margin-top: 0.3rem;
         margin-bottom: 0.05em;
+
+        & em
+        {
+            margin-right: 0.12em;
+        }
     }
     & h1
     {
