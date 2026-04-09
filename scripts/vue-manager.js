@@ -1,6 +1,6 @@
 // import { createApp, ref, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js'
 import { createApp, ref, onMounted, useTemplateRef } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-import { renderToHTML } from './markdown-hub.js'
+import { renderMDToHTML } from './markdown-hub.js'
 
 // #region Helpers and Consts
 
@@ -58,6 +58,37 @@ function tryCaratFromPoint(xPos, yPos, options = {})
 
     console.warn("Attempted to get carat position/range, but no method for doing so is supported in this browser.");
     return null;
+}
+
+/**
+ * Attempts to get AST positioning data from a given Node, and if successful, applies it to a destination object.
+ * @param {Node|null} dataSource The source to attempt to get positioning data from.
+ * @param {String} sourceKey The name of the `dataset` key on {@linkcode dataSource} to attempt getting position data from.
+ * @param {Object} destination The object to save successfully retrieved position data in.
+ * @param {Boolean} sourceIsSibling Is {@linkcode dataSource} a sibling node/element of a certain reference point?
+ * @param {Number} levelIncrease How many levels up from a certain reference point {@linkcode dataSource} is.
+ * @returns Whether position data was successfully retrieved and saved into {@linkcode destination}.
+ */
+function trySavePosData(dataSource, sourceKey, destination, sourceIsSibling = false, levelIncrease = 0)
+{
+    let posData = dataSource?.dataset?.[sourceKey]?.split(";");
+    if (!posData) return false;
+
+    // These should be numbers, and so they are cast to them via `+`. Any NaNs or whatever that result can
+    // just be assumed to mean N/A.
+    destination.line = +posData[0];
+    destination.column = +posData[1];
+    destination.offset = +posData[2];
+    destination.childStartPos = dataSource.dataset["mdFirstChildStart"]
+        ?.split(";").map(item => +item);
+
+    destination.isSibling = sourceIsSibling;
+
+    if (destination.levelsUp) destination.levelsUp += levelIncrease;
+    else destination.levelsUp = levelIncrease;
+
+    destination.__debugActualNode = dataSource;
+    return true;
 }
 
 // #endregion
@@ -232,7 +263,9 @@ createApp({
             switch (calcType)
             {
                 case "total":
-                    const targetScore = stats.value.main[scoreAbbrv] ?? stats.value.saves[scoreAbbrv] ?? stats.value.other[scoreAbbrv];
+                    const targetScore = stats.value.main[scoreAbbrv]
+                        ?? stats.value.saves[scoreAbbrv]
+                        ?? stats.value.other[scoreAbbrv];
                     return targetScore?.base + targetScore?.extr;
 
                 case "bonus":
@@ -251,7 +284,9 @@ createApp({
         {
             const thisSkill = skills.value[skillKey];
             thisSkill.subtypes.push(new Skill(
-                thisSkill.displayName, thisSkill.ability, 0, 0, thisSkill.trainedOnly, "", null
+                thisSkill.displayName, thisSkill.ability,
+                0, 0,
+                thisSkill.trainedOnly, "", null
             ));
         }
         function removeSubtype(e, skillKey, thisIndex)
@@ -263,11 +298,101 @@ createApp({
 
         function passDisplayClick(e, inputDesc)
         {
-            const clickLocation = tryCaratFromPoint(e.clientX, e.clientY);
+            const cursorPosObj = window.getSelection();
 
-            let correspondingNode = [];
+            // When a blank line (<br>) is clicked, instead of returning that <br> as the anchor node, we get the entire
+            // container instead for some reason. Account for that.
+            if (cursorPosObj.anchorNode.nodeName === "OUTPUT")
+            {
+                // In this case, anchorOffset appears to be the number of nodes before the cursor that are direct children
+                // of anchorNode. We can use this to get a corresponding position in inputDesc, but we need to account for
+                // the extra <br>s that inputDesc has.
+                // \+/ Note the `<=`, rather than just `<`; We want to ensure the final node we traverse isn't also a 
+                // \+/ first-in-a-row <br>!
+                let previous = null;
+                let targetIndex = cursorPosObj.anchorOffset;
+                for (let i = 0; i <= targetIndex; i++)
+                {
+                    // If this is a <br>, and the element before this wasn't, this is one of those "extra" <br>s.
+                    if (inputDesc.childNodes[i].nodeName === "BR" && !(previous?.nodeName === "BR"))
+                    {
+                        targetIndex++;
+                    }
+                    previous = inputDesc.childNodes[i];
+                }
 
-            inputDesc.focus();
+                cursorPosObj.setPosition(inputDesc.childNodes[targetIndex]);
+                return;
+            }
+
+
+            let referencePosData = { levelsUp: 0 };
+            let accumulatedOffset = 0;
+            let current = cursorPosObj.anchorNode;
+
+            // Go backward through the HTML to find an element with a data-offset attribute.
+            while (!referencePosData.hasOwnProperty("offset") && current)
+            {
+                // If we somehow clicked directly onto a node with position data (like, for example, clicking an HR)
+                if (trySavePosData(current, "mdStart", referencePosData))
+                    continue;
+
+                // If this node has nothing before it, go up one level.
+                if (!current.previousSibling)
+                {
+                    // Check for positioning data, then prepare to look backward through this level next.
+                    //     If positioning data was found, the loop will end, rather than continue.
+                    trySavePosData(current.parentNode, "mdStart", referencePosData, false, 1);
+
+                    current = current.parentNode;
+                    continue;
+                }
+
+                // If this node has something before it, check if that something has offset info. If so, break the loop.
+                if (trySavePosData(current.previousSibling, "mdEnd", referencePosData, true))
+                    continue;
+
+                // Otherwise, add the length of this previous node to our accumulator, and set it as
+                // the new "current" node (i.e. prepare to look behind it in the next loop).
+                accumulatedOffset += current.previousSibling.nodeValue?.length ?? 0;
+                // <br>s have no length, but still count for one; add 1 in that case (bool coerced to 0 or 1)
+                accumulatedOffset += current.previousSibling.tagName === "BR";
+
+                current = current.previousSibling;
+            }
+
+
+            // Add up the offset stuff we calculated above, and place the user's cursor in the input description
+            // in preparation to use that offset.
+            accumulatedOffset += referencePosData.offset + cursorPosObj.anchorOffset;
+            cursorPosObj.setPosition(inputDesc.firstChild);
+
+            for (let i = 0; i < accumulatedOffset; i++)
+            {
+                // Move character by character till we get past the reference position we found. From there, extend
+                // rather than move.
+                cursorPosObj.modify(i < referencePosData.offset ? "move" : "extend",
+                    "forward", "character");
+            }
+
+
+            // There may still be formatting characters offsetting things; check if our reference position is ahead of
+            // our target offset (as opposed to encompassing),
+            //     and if so, wehther there's a discrepancy between the start offset of the reference's first child and
+            //     our aforementioned target offset.
+            if (!referencePosData.isSibling && referencePosData.childStartPos)
+            {
+                // and if so, whether there's a discrepancy between the start offset of our references's first child and
+                // our target offset.
+                let delta = referencePosData.childStartPos?.[2] - referencePosData.offset;
+                if (delta > 0)
+                    for (let i = 0; i < delta; i++)
+                    {
+                        cursorPosObj.modify("extend", "forward", "character");
+                    }
+            }
+
+            cursorPosObj.collapseToEnd();
         }
 
 
@@ -314,7 +439,7 @@ createApp({
 
         function updateDesc(e, featIndex, displayDesc)
         {
-            displayDesc.innerHTML = renderToHTML(e.target.innerHTML.replace(/<br>/gm, "\n"));
+            displayDesc.innerHTML = renderMDToHTML(e.target.innerHTML.replace(/<br>/gm, "\n"));
 
             feats.value[featIndex].dirty = e.target.innerHTML !== feats.value[featIndex].description;
         }
@@ -326,7 +451,7 @@ createApp({
             else
             {
                 inputDesc.innerHTML = feats.value[featIndex].description;
-                displayDesc.innerHTML = renderToHTML(inputDesc.innerHTML.replace(/<br>/gm, "\n"));
+                displayDesc.innerHTML = renderMDToHTML(inputDesc.innerHTML.replace(/<br>/gm, "\n"));
             }
 
             feats.value[featIndex].dirty = false;
@@ -344,8 +469,10 @@ createApp({
             for (let i = 0; i < feats.value.length; i++)
             {
                 featDescElemRefs.value[i].innerHTML = feats.value[i].description;
-                featDispElemRefs.value[i].innerHTML = renderToHTML(featDescElemRefs.value[i].innerHTML.replace(/<br>/gm, "\n"));
+                featDispElemRefs.value[i].innerHTML = renderMDToHTML(featDescElemRefs.value[i].innerHTML.replace(/<br>/gm, "\n"));
             }
+
+            // TODO: Once changes can be saved, call an auto-load function if the user's got an appropriate setting ticked
         })
 
         return {

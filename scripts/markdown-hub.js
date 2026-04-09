@@ -3,25 +3,50 @@ import { gfm } from 'https://esm.sh/micromark-extension-gfm@3?bundle'
 import { gfmFromMarkdown } from 'https://esm.sh/mdast-util-gfm@3?bundle'
 import { newlineToBreak } from 'https://esm.sh/mdast-util-newline-to-break@2?bundle'
 import { toHast } from 'https://esm.sh/mdast-util-to-hast@13?bundle'
-import { format } from 'https://esm.sh/hast-util-format@1?bundle'
+import { sanitize } from 'https://esm.sh/hast-util-sanitize@5?bundle'
+import { minifyWhitespace } from 'https://esm.sh/hast-util-minify-whitespace@1?bundle'
 import { toHtml } from 'https://esm.sh/hast-util-to-html@9?bundle'
+import { toString } from 'https://esm.sh/mdast-util-to-string@4'
+// \+/ See https://github.com/syntax-tree.
 
 
 
-export function renderToHTML(md)
+export function renderMDToHTML(md)
 {
     const mTree = fromMarkdown(md, {
         extensions: [gfm()],
         mdastExtensions: [gfmFromMarkdown()]
     });
     newlineToBreak(mTree);
-    mTree.children = syncMdastLinePositions(mTree.children);
 
-    const hTree = toHast(mTree);
-    format(hTree);
+    ////console.group("Debug info regarding line break addition/restoration:");
+    mTree.children = syncMdastLinePositions(mTree.children);
+    ////console.groupEnd();
+
+    const hTree = sanitize(toHast(mTree));
+    minifyWhitespace(hTree);
+    hTree.children = earmarkHastNodeOffsets(hTree.children);
 
     return toHtml(hTree);
 }
+
+/**
+ * Takes a string with markdown syntax in it, parses it, and returns plaintext.\
+ * &emsp; Note that this *should* mean that lone asterisks and similar inert formatting characters are preserved.
+ * @param {String} mdString A string with markdown syntax to be removed.
+ * 
+ * @returns {String} {@linkcode mdString}, with all parsed markdown formatting characters removed.
+ */
+export function unMarkdownString(mdString)
+{
+    const mTree = fromMarkdown(mdString, {
+        extensions: [gfm()],
+        mdastExtensions: [gfmFromMarkdown()]
+    });
+    return toString(mTree);
+}
+
+
 
 /**
  * Traverses the provided mdast items, and inserts breaks to fill gaps between the end/start lines of positioned elements.
@@ -31,13 +56,14 @@ export function renderToHTML(md)
  */
 function syncMdastLinePositions(treeArray)
 {
-    // Init to 0, so if the first positioned element can be property indented/synced as well
+    // Init to 0, so the first positioned element can be property indented/synced as well
     let lastPos = { end: { line: 0 } };
     let breaks = 0;
 
     for (let i = 0; i < treeArray.length; i++)
     {
-        console.log(treeArray[i])
+        ////console.log(treeArray[i]);
+
         const pos = treeArray[i].position;
         if (!pos)
         {
@@ -52,8 +78,8 @@ function syncMdastLinePositions(treeArray)
         {
             // Insert a break at current, then increment i to put us back where we started.
             treeArray.splice(i, 0, { type: "break" });
-            console.log("\t%o", treeArray[i]);
 
+            ////console.log("\t%o", treeArray[i]);
             i++;
         }
 
@@ -63,6 +89,71 @@ function syncMdastLinePositions(treeArray)
 
     return treeArray;
 }
+
+/**
+ * Traverses the provided hast items and, for each of type `element` that has positional data, attaches an attribute\
+ * indicating that data; its character offset, start & end.\
+ * &emsp; *(Remarkably enough, these offsets are according to the markdown it was created from!)*
+ * @param {[]} inputNodes The array of items that make up the hast we want to mark (typically the `children` property).
+ * 
+ * @returns {[]} {@linkcode inputNodes}, with each `element` type item & sub-item given attributes containing data about\
+ * its position, via the `properties` property.
+ */
+function earmarkHastNodeOffsets(inputNodes)
+{
+    for (let i = 0; i < inputNodes.length; i++)
+    {
+        // Can't put attributes on non-elements.
+        if (inputNodes[i]?.type !== "element") continue;
+        ////console.log(i, ": ", inputNodes[i].position || "[NO POSITIONING DATA]");
+
+        // If we have positioning information for this element,
+        if (inputNodes[i].position)
+        {
+            // Add some of that information to it by merging some items into its `properties` property.
+            inputNodes[i].properties = {
+                ...inputNodes[i].properties,
+
+                "dataMdStart": [
+                    inputNodes[i].position.start.line,
+                    inputNodes[i].position.start.column,
+                    inputNodes[i].position.start.offset,].join(";"),
+                "dataMdEnd": [
+                    inputNodes[i].position.end.line,
+                    inputNodes[i].position.end.column,
+                    inputNodes[i].position.end.offset,].join(";")
+            };
+
+            // If this node has children, and the first one has a position, note it; this'll indicate the
+            // presence of any formatting characters at the very start.
+            if (inputNodes[i].children?.[0]?.position)
+            {
+                inputNodes[i].properties = {
+                    ...inputNodes[i].properties,
+
+                    "dataMdFirstChildStart": [
+                        inputNodes[i].children[0].position.start.line,
+                        inputNodes[i].children[0].position.start.column,
+                        inputNodes[i].children[0].position.start.offset].join(";")
+                };
+
+                ////console.log(inputNodes[i], ": ", inputNodes[i].properties.dataMdFirstChildStart);
+            }
+        }
+
+        // Do the same for children, if any exist.
+        //     We could check if there are any of type `element` before delving in, but that 
+        //     would require a loop as well, i.e. be redundant.
+        if (!inputNodes[i].children) continue;
+        ////console.groupCollapsed("-> ", inputNodes[i].children);
+        inputNodes.children = earmarkHastNodeOffsets(inputNodes[i].children);
+        ////console.groupEnd();
+    }
+
+    return inputNodes;
+}
+
+
 
 function separateMdastListEndings(treeArray)
 {
